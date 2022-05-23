@@ -1,0 +1,37 @@
+package com.bluerizon.hcmanager.dao;
+
+import com.bluerizon.hcmanager.models.Encaissements;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+public interface EncaissementsDao {
+
+    Optional<Encaissements> findById(Long id);
+
+    Encaissements save(Encaissements encaissement);
+
+    List<Encaissements> findByDeletedFalse();
+
+    List<Encaissements> findByDeletedFalse(Pageable pageable);
+
+    List<Encaissements> recherche(String search, Pageable pageable);
+
+    Long countEncaissements();
+
+    Long countRecherche(String search);
+
+    List<Encaissements> findByDateEncaissementAndDeletedFalse(Date dateEncaissement, Pageable pageable);
+
+    List<Encaissements> recherche(final Date dateEncaissement, String search, Pageable pageable);
+
+    Long countEncaissements(final Date dateEncaissement);
+
+    Long countRecherche(final Date dateEncaissement, String search);
+
+    Double montantDate(final Date startDate);
+
+}

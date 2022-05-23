@@ -1,0 +1,53 @@
+package com.bluerizon.hcmanager.service;
+
+import com.bluerizon.hcmanager.dao.PatientsDao;
+import com.bluerizon.hcmanager.models.Patients;
+import com.bluerizon.hcmanager.repository.PatientsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class PatientService implements PatientsDao {
+
+    @Autowired
+    private PatientsRepository repository;
+
+    @Override
+    public Optional<Patients> findById(Long id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    public Patients save(Patients patient) {
+        return repository.save(patient);
+    }
+
+    @Override
+    public List<Patients> findByDeletedFalse() {
+        return repository.findByDeletedFalse();
+    }
+
+    @Override
+    public List<Patients> findByDeletedFalse(Pageable pageable) {
+        return repository.findByDeletedFalse(pageable);
+    }
+
+    @Override
+    public List<Patients> recherche(String search, Pageable pageable) {
+        return repository.recherche(search, pageable);
+    }
+
+    @Override
+    public Long countPatients() {
+        return repository.countPatients();
+    }
+
+    @Override
+    public Long countRecherche(String search) {
+        return repository.countRecherche(search);
+    }
+}
