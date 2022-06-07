@@ -2,6 +2,7 @@ package com.bluerizon.hcmanager.service;
 
 import com.bluerizon.hcmanager.dao.EncaissementsDao;
 import com.bluerizon.hcmanager.models.Encaissements;
+import com.bluerizon.hcmanager.models.Factures;
 import com.bluerizon.hcmanager.repository.EncaissementsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,11 @@ public class EncaissementService implements EncaissementsDao {
     @Override
     public List<Encaissements> findByDeletedFalse(Pageable pageable) {
         return repository.findByDeletedFalse(pageable);
+    }
+
+    @Override
+    public List<Encaissements> findByFactureAndDeletedFalse(Factures facture) {
+        return repository.findByFactureAndDeletedFalse(facture);
     }
 
     @Override

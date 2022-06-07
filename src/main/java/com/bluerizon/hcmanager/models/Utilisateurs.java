@@ -22,7 +22,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "utilisateurs")
-@JsonIgnoreProperties(value = {"updatedAt", "deleted", "version" })
+@JsonIgnoreProperties(value = {"updatedAt", "deleted", "version", "password" })
 @EntityListeners({ AuditingEntityListener.class })
 public class Utilisateurs implements Serializable
 {

@@ -6,18 +6,15 @@ import javax.persistence.Column;
 
 public class FTraitementResponse {
     private Kotas kota;
-    private Double taux;
     private boolean unite;
     private Double netPayAssu;
     private Double baseRembours;
     private Double netPayBeneficiaire;
-
     public FTraitementResponse() {
     }
 
-    public FTraitementResponse(Kotas kota, Double taux, boolean unite, Double netPayAssu, Double baseRembours, Double netPayBeneficiaire) {
+    public FTraitementResponse(Kotas kota, boolean unite, Double netPayAssu, Double baseRembours, Double netPayBeneficiaire) {
         this.kota = kota;
-        this.taux = taux;
         this.unite = unite;
         this.netPayAssu = netPayAssu;
         this.baseRembours = baseRembours;
@@ -30,14 +27,6 @@ public class FTraitementResponse {
 
     public void setKota(Kotas kota) {
         this.kota = kota;
-    }
-
-    public Double getTaux() {
-        return taux;
-    }
-
-    public void setTaux(Double taux) {
-        this.taux = taux;
     }
 
     public boolean isUnite() {

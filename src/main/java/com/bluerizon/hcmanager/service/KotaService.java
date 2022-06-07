@@ -22,6 +22,11 @@ public class KotaService implements KotasDao {
     }
 
     @Override
+    public Kotas findByLibelleAndDeletedFalse(String libelle) {
+        return repository.findByLibelleAndDeletedFalse(libelle);
+    }
+
+    @Override
     public Kotas save(Kotas kota) {
         return repository.save(kota);
     }
@@ -49,5 +54,10 @@ public class KotaService implements KotasDao {
     @Override
     public Long countRecherche(String search) {
         return repository.countRecherche(search);
+    }
+
+    @Override
+    public Boolean existsByLibelle(String libelle) {
+        return repository.existsByLibelle(libelle);
     }
 }

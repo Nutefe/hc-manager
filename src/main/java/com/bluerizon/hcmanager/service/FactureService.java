@@ -47,6 +47,11 @@ public class FactureService implements FacturesDao {
     }
 
     @Override
+    public Long count() {
+        return repository.count();
+    }
+
+    @Override
     public Long countRecherche(String search) {
         return repository.countRecherche(search);
     }

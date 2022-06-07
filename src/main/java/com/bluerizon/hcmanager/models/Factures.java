@@ -47,8 +47,12 @@ public class Factures implements Serializable {
     private boolean solde;
     @Column(name = "encaisse", columnDefinition="tinyint(1) default 0")
     private boolean encaisse;
+    @Column(name = "numero", unique = true)
+    private String numero;
     @Column(name = "fileName")
     private String fileName;
+    @Column(name = "total", columnDefinition="int default 0.0")
+    private Double total;
     @Column(name = "acompte", columnDefinition="int default 0.0")
     private Double acompte;
     @Column(name = "remise", columnDefinition="int default 0.0")
@@ -105,6 +109,14 @@ public class Factures implements Serializable {
         this.fiche = fiche;
     }
 
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
     public boolean isSolde() {
         return solde;
     }
@@ -127,6 +139,14 @@ public class Factures implements Serializable {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
     }
 
     public Double getAcompte() {
@@ -201,7 +221,8 @@ public class Factures implements Serializable {
         return solde == factures.solde && encaisse == factures.encaisse && version == factures.version &&
                 deleted == factures.deleted && Objects.equals(id, factures.id) &&
                 Objects.equals(utilisateur, factures.utilisateur) && Objects.equals(fiche, factures.fiche) &&
-                Objects.equals(fileName, factures.fileName) && Objects.equals(acompte, factures.acompte) &&
+                Objects.equals(numero, factures.numero) && Objects.equals(fileName, factures.fileName) &&
+                Objects.equals(total, factures.total) && Objects.equals(acompte, factures.acompte) &&
                 Objects.equals(remise, factures.remise) && Objects.equals(reste, factures.reste) &&
                 Objects.equals(dateFacture, factures.dateFacture) && Objects.equals(createdAt, factures.createdAt) &&
                 Objects.equals(updatedAt, factures.updatedAt);
@@ -209,8 +230,8 @@ public class Factures implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, utilisateur, fiche, solde, encaisse, fileName, acompte, remise, reste, dateFacture,
-                version, deleted, createdAt, updatedAt);
+        return Objects.hash(id, utilisateur, fiche, solde, encaisse, numero, fileName, total, acompte, remise, reste,
+                dateFacture, version, deleted, createdAt, updatedAt);
     }
 
     @Override
@@ -221,7 +242,9 @@ public class Factures implements Serializable {
                 ", fiche=" + fiche +
                 ", solde=" + solde +
                 ", encaisse=" + encaisse +
+                ", numero='" + numero + '\'' +
                 ", fileName='" + fileName + '\'' +
+                ", total=" + total +
                 ", acompte=" + acompte +
                 ", remise=" + remise +
                 ", reste=" + reste +

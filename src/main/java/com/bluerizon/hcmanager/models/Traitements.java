@@ -35,6 +35,9 @@ public class Traitements implements Serializable
     @JoinColumn(name = "typeTraitement", referencedColumnName = "id", nullable = false)
     @ManyToOne
     private TypeTraitements typeTraitement;
+    @JoinColumn(name = "typePatient", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    private TypePatients typePatient;
     @Column(name = "libelle", nullable = false, length = 50)
     private String libelle;
     @Column(name = "description")
@@ -87,6 +90,14 @@ public class Traitements implements Serializable
 
     public void setTypeTraitement(TypeTraitements typeTraitement) {
         this.typeTraitement = typeTraitement;
+    }
+
+    public TypePatients getTypePatient() {
+        return typePatient;
+    }
+
+    public void setTypePatient(TypePatients typePatient) {
+        this.typePatient = typePatient;
     }
 
     public String getLibelle() {
@@ -152,13 +163,15 @@ public class Traitements implements Serializable
         Traitements that = (Traitements) o;
         return deleted == that.deleted && version == that.version && Objects.equals(id, that.id) &&
                 Objects.equals(utilisateur, that.utilisateur) && Objects.equals(typeTraitement, that.typeTraitement) &&
-                Objects.equals(libelle, that.libelle) && Objects.equals(description, that.description) &&
-                Objects.equals(price, that.price) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+                Objects.equals(typePatient, that.typePatient) && Objects.equals(libelle, that.libelle) &&
+                Objects.equals(description, that.description) && Objects.equals(price, that.price) &&
+                Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, utilisateur, typeTraitement, libelle, description, price, deleted, version, createdAt, updatedAt);
+        return Objects.hash(id, utilisateur, typeTraitement, typePatient, libelle, description, price, deleted,
+                version, createdAt, updatedAt);
     }
 
     @Override
@@ -167,6 +180,7 @@ public class Traitements implements Serializable
                 "id=" + id +
                 ", utilisateur=" + utilisateur +
                 ", typeTraitement=" + typeTraitement +
+                ", typePatient=" + typePatient +
                 ", libelle='" + libelle + '\'' +
                 ", description='" + description + '\'' +
                 ", price=" + price +

@@ -50,7 +50,7 @@ public class DbInitializer implements CommandLineRunner
 
         if (!this.profilsRepository.existsById(1)){
             Profils sys = this.profilsRepository.save(profil1);
-            profils.add(sys);
+             profils.add(sys);
         }
 
         Profils profil2 = new Profils();
@@ -79,6 +79,15 @@ public class DbInitializer implements CommandLineRunner
         if (!this.profilsRepository.existsById(4)){
             Profils cai = this.profilsRepository.save(profil4);
             profils.add(cai);
+        }
+        Profils profil5 = new Profils();
+        profil5.setId(5);
+        profil5.setLibelle("PROFIL_GESTIONNAIRE");
+
+
+        if (!this.profilsRepository.existsById(5)){
+            Profils ges = this.profilsRepository.save(profil5);
+            profils.add(ges);
         }
 
         if (profilsRepository.count()>0){

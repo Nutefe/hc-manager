@@ -1,6 +1,7 @@
 package com.bluerizon.hcmanager.repository;
 
 import com.bluerizon.hcmanager.models.Encaissements;
+import com.bluerizon.hcmanager.models.Factures;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,6 +14,7 @@ public interface EncaissementsRepository extends JpaRepository<Encaissements, Lo
     List<Encaissements> findByDeletedFalse();
 
     List<Encaissements> findByDeletedFalse(Pageable pageable);
+    List<Encaissements> findByFactureAndDeletedFalse(Factures facture);
 
     @Query("SELECT e FROM Encaissements e WHERE (e.dateEncaissement LIKE CONCAT('%',:search,'%') OR " +
             " e.facture.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +

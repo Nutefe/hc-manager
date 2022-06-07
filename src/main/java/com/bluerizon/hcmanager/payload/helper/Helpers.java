@@ -8,14 +8,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.FileNameMap;
 import java.net.URLConnection;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 public class Helpers
 {
+    public static String path_file = "/home/upload/hc-manager/facture/";
     public static String currentDate() {
         final Date date = new Date();
         final SimpleDateFormat datej = new SimpleDateFormat("yyyy-MM-dd");
@@ -58,29 +61,27 @@ public class Helpers
         final Calendar calendar = Calendar.getInstance();
         return datejour+""+heurejour+""+calendar.getTimeInMillis();
     }
-    
-    public static String typeFile() throws IOException {
-        final File file = new File("3.flv");
-        final FileNameMap fileNameMap = URLConnection.getFileNameMap();
-        final String mimeType = fileNameMap.getContentTypeFor(file.getName());
-        return mimeType;
+
+    public static String convertDate(Date dateInit){
+        DateFormat date = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, new Locale("FR","fr"));
+        SimpleDateFormat datej = new SimpleDateFormat("dd/MM/yyyy");
+        String datejour = datej.format(dateInit);
+
+        return datejour;
     }
-    
-    public static String sizeFile() {
-        final double size_bytes = 1.999901221E9;
-        final double size_kb = size_bytes / 1024.0;
-        final double size_mb = size_kb / 1024.0;
-        final double size_gb = size_mb / 1024.0;
-        String cnt_size;
-        if (size_gb > 0.0) {
-            cnt_size = size_gb+"";
-        }
-        else if (size_mb > 0.0) {
-            cnt_size = size_mb+"";
-        }
-        else {
-            cnt_size =  size_kb+"";
-        }
-        return cnt_size;
+
+    public static String convertHeure(Date dateInit){
+        DateFormat date = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, new Locale("FR","fr"));
+        SimpleDateFormat heure = new SimpleDateFormat("HH:mm:ss");
+        String heurejour = heure.format(dateInit);
+        return heurejour;
+    }
+
+    public static String year(){
+//        DateFormat date = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, new Locale("FR","fr"));
+        Date date = new Date();
+        SimpleDateFormat datej = new SimpleDateFormat("yyyy");
+        String datejour = datej.format(date);
+        return datejour;
     }
 }

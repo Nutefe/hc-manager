@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface KotasRepository extends JpaRepository<Kotas, Integer> {
 
+    Kotas findByLibelleAndDeletedFalse(String libelle);
     List<Kotas> findByDeletedFalse();
 
     List<Kotas> findByDeletedFalse(Pageable pageable);
@@ -22,5 +23,7 @@ public interface KotasRepository extends JpaRepository<Kotas, Integer> {
 
     @Query("SELECT COUNT(k) FROM Kotas k WHERE k.libelle LIKE CONCAT('%',:search,'%') AND (k.deleted = false)")
     Long countRecherche(String search);
+
+    Boolean existsByLibelle(String libelle);
 
 }

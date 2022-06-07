@@ -1,6 +1,7 @@
 package com.bluerizon.hcmanager.dao;
 
 import com.bluerizon.hcmanager.models.Encaissements;
+import com.bluerizon.hcmanager.models.Factures;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,6 +18,8 @@ public interface EncaissementsDao {
     List<Encaissements> findByDeletedFalse();
 
     List<Encaissements> findByDeletedFalse(Pageable pageable);
+
+    List<Encaissements> findByFactureAndDeletedFalse(Factures facture);
 
     List<Encaissements> recherche(String search, Pageable pageable);
 

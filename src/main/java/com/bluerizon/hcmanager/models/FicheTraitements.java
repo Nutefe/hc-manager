@@ -26,8 +26,6 @@ public class FicheTraitements implements Serializable
     @JoinColumn(name = "kota", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private Kotas kota;
-    @Column(name = "taux", nullable = false)
-    private Double taux;
     @Column(name = "unite", nullable = false)
     private boolean unite;
     @Column(name = "netPayAssu")
@@ -75,13 +73,13 @@ public class FicheTraitements implements Serializable
         this.kota = kota;
     }
 
-    public Double getTaux() {
-        return taux;
-    }
-
-    public void setTaux(Double taux) {
-        this.taux = taux;
-    }
+//    public Double getTaux() {
+//        return taux;
+//    }
+//
+//    public void setTaux(Double taux) {
+//        this.taux = taux;
+//    }
 
     public boolean isUnite() {
         return unite;
@@ -152,12 +150,17 @@ public class FicheTraitements implements Serializable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FicheTraitements that = (FicheTraitements) o;
-        return unite == that.unite && deleted == that.deleted && version == that.version && Objects.equals(ficheTraitementPK, that.ficheTraitementPK) && Objects.equals(kota, that.kota) && Objects.equals(taux, that.taux) && Objects.equals(netPayAssu, that.netPayAssu) && Objects.equals(baseRembours, that.baseRembours) && Objects.equals(netPayBeneficiaire, that.netPayBeneficiaire) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return unite == that.unite && deleted == that.deleted && version == that.version &&
+                Objects.equals(ficheTraitementPK, that.ficheTraitementPK) && Objects.equals(kota, that.kota) &&
+                Objects.equals(netPayAssu, that.netPayAssu) && Objects.equals(baseRembours, that.baseRembours) &&
+                Objects.equals(netPayBeneficiaire, that.netPayBeneficiaire) &&
+                Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ficheTraitementPK, kota, taux, unite, netPayAssu, baseRembours, netPayBeneficiaire, deleted, version, createdAt, updatedAt);
+        return Objects.hash(ficheTraitementPK, kota, unite, netPayAssu, baseRembours, netPayBeneficiaire, deleted,
+                version, createdAt, updatedAt);
     }
 
     @Override
@@ -165,7 +168,6 @@ public class FicheTraitements implements Serializable
         return "FicheTraitements{" +
                 "ficheTraitementPK=" + ficheTraitementPK +
                 ", kota=" + kota +
-                ", taux=" + taux +
                 ", unite=" + unite +
                 ", netPayAssu=" + netPayAssu +
                 ", baseRembours=" + baseRembours +

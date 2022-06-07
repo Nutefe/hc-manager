@@ -6,10 +6,13 @@ package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.EncaissementsDao;
 import com.bluerizon.hcmanager.dao.EntreprisesDao;
+import com.bluerizon.hcmanager.dao.FacturesDao;
 import com.bluerizon.hcmanager.dao.UtilisateursDao;
 import com.bluerizon.hcmanager.exception.NotFoundRequestException;
 import com.bluerizon.hcmanager.models.Encaissements;
 import com.bluerizon.hcmanager.models.Entreprises;
+import com.bluerizon.hcmanager.models.Factures;
+import com.bluerizon.hcmanager.models.Utilisateurs;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.EncaissementPage;
 import com.bluerizon.hcmanager.payload.pages.EntreprisePage;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -51,6 +55,10 @@ public class EncaissementController
 
     @Autowired
     private EncaissementsDao encaissementsDao;
+    @Autowired
+    private FacturesDao facturesDao;
+    @Autowired
+    private UtilisateursDao utilisateursDao;
 
     @GetMapping("/encaissement/{id}")
     public Encaissements getOne(@PathVariable("id") final Long id) {
@@ -270,18 +278,70 @@ public class EncaissementController
 
     @RequestMapping(value = "/encaissement", method =  RequestMethod.POST)
     public Encaissements save(@Valid @RequestBody Encaissements request, @CurrentUser final UserDetailsImpl currentUser) {
+        Factures facture = this.facturesDao.findById(request.getFacture().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Utilisateurs utilisateur = this.utilisateursDao.findById(request.getFacture().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        if (!facture.isSolde()){
+            if (facture.isEncaisse()){
+                List<Encaissements> encaissements = this.encaissementsDao.findByFactureAndDeletedFalse(facture);
+                Double initEnc = 0.0;
+                for (Encaissements item :
+                        encaissements) {
+                    initEnc +=item.getMontant();
+                }
+                if ((facture.getTotal() - initEnc) >= request.getMontant()){
+                    request.setFacture(facture);
+                    request.setUtilisateur(utilisateur);
+                    request.setDateEncaissement(new Date());
+                    request.setReliquat(request.getTotal() - request.getMontant());
+                    Encaissements paye = this.encaissementsDao.save(request);
+                    facture.setEncaisse(true);
+                    this.facturesDao.save(facture);
+                    if (facture.getTotal() == (initEnc + paye.getMontant())){
+                        facture.setSolde(true);
+                        this.facturesDao.save(facture);
+                    }
+                } else {
+
+                }
+            } else {
+                if (facture.getAcompte() > 0.0){
+                    if (facture.getAcompte() == request.getMontant()){
+                        request.setFacture(facture);
+                        request.setUtilisateur(utilisateur);
+                        request.setDateEncaissement(new Date());
+                        request.setReliquat(request.getTotal() - request.getMontant());
+                        Encaissements paye = this.encaissementsDao.save(request);
+                        facture.setEncaisse(true);
+                        this.facturesDao.save(facture);
+                        if (facture.getTotal() == paye.getMontant()){
+                            facture.setSolde(true);
+                            this.facturesDao.save(facture);
+                        }
+                    } else {
+
+                    }
+                } else {
+                    if (facture.getTotal() >= request.getMontant()){
+                        request.setFacture(facture);
+                        request.setUtilisateur(utilisateur);
+                        request.setDateEncaissement(new Date());
+                        request.setReliquat(request.getTotal() - request.getMontant());
+                        Encaissements paye = this.encaissementsDao.save(request);
+                        facture.setEncaisse(true);
+                        this.facturesDao.save(facture);
+                        if (facture.getTotal() == paye.getMontant()){
+                            facture.setSolde(true);
+                            this.facturesDao.save(facture);
+                        }
+                    } else {
+
+                    }
+                }
+
+            }
+        }
         return this.encaissementsDao.save(request);
     }
-
-//    @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.PUT)
-//    public Entreprises update(@Valid @RequestBody Entreprises request, @PathVariable("id") final Long id) {
-//        Entreprises entrepriseInit = this.entreprisesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-//        entrepriseInit.setRaisonSocial(request.getRaisonSocial());
-//        entrepriseInit.setNif(request.getNif());
-//        entrepriseInit.setTelephone(request.getTelephone());
-//        entrepriseInit.setAdresse(request.getAdresse());
-//        return this.entreprisesDao.save(entrepriseInit);
-//    }
 
     @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.DELETE)
     public void delete(@PathVariable("id") final Long id) {

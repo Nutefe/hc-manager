@@ -29,7 +29,7 @@ public class Kotas implements Serializable
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    @Column(name = "libelle", length = 50)
+    @Column(name = "libelle", unique = true, length = 10)
     private String libelle;
     @Column(name = "deleted", columnDefinition = "tinyint(1) default 0")
     private boolean deleted;

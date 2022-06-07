@@ -11,6 +11,8 @@ public interface KotasDao {
 
     Optional<Kotas> findById(Integer id);
 
+    Kotas findByLibelleAndDeletedFalse(String libelle);
+
     Kotas save(Kotas kota);
 
     List<Kotas> findByDeletedFalse();
@@ -22,5 +24,7 @@ public interface KotasDao {
     Long countKotas();
 
     Long countRecherche(String search);
+
+    Boolean existsByLibelle(String libelle);
 
 }

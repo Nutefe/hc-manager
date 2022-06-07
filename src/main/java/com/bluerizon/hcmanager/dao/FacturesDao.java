@@ -20,6 +20,7 @@ public interface FacturesDao {
     List<Factures> recherche(String search, Pageable pageable);
 
     Long countFactures();
+    Long count();
 
     Long countRecherche(String search);
 
