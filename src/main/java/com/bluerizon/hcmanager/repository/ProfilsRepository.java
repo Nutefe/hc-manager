@@ -14,19 +14,19 @@ public interface ProfilsRepository extends JpaRepository<Profils, Integer> {
 
     List<Profils> findByDeletedFalse();
 
-    @Query("SELECT p FROM Profils p WHERE p.deleted = false")
+    @Query("SELECT p FROM Profils p WHERE p.deleted = false And p.id != 1")
     List<Profils> selectProfils();
 
-    @Query("SELECT p FROM Profils p WHERE p.deleted = false")
+    @Query("SELECT p FROM Profils p WHERE p.deleted = false And p.id != 1")
     List<Profils> selectProfils(Pageable pageable);
 
-    @Query("SELECT p FROM Profils p WHERE p.libelle LIKE CONCAT('%',:search,'%') AND (p.deleted = false)")
+    @Query("SELECT p FROM Profils p WHERE p.libelle LIKE CONCAT('%',:search,'%') AND (p.deleted = false And p.id != 1)")
     List<Profils> recherche(String search, Pageable pageable);
 
-    @Query("SELECT COUNT(p) FROM Profils p WHERE p.deleted = false")
+    @Query("SELECT COUNT(p) FROM Profils p WHERE p.deleted = false And p.id != 1")
     Long countProfils();
 
-    @Query("SELECT COUNT(p) FROM Profils p WHERE p.libelle LIKE CONCAT('%',:search,'%') AND (p.deleted = false)")
+    @Query("SELECT COUNT(p) FROM Profils p WHERE p.libelle LIKE CONCAT('%',:search,'%') AND (p.deleted = false And p.id != 1) ")
     Long countRecherche(String search);
 
 }

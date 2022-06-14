@@ -52,7 +52,6 @@ public class FicheController
         return fiche;
     }
 
-
     @RequestMapping(value ="/fiches/page/{id}/{page}", method = RequestMethod.GET)
     @ResponseBody
     public FichePage selectAllPage(@PathVariable(value = "id") Long id, @PathVariable(value = "page") int page) {
@@ -105,7 +104,7 @@ public class FicheController
 
     @RequestMapping(value = "/fiches/search/page/{id}/{page}/{s}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public FichePage searchProfilPage(@PathVariable(value = "id") Long id, @PathVariable(value = "page") int page,
+    public FichePage searchFichePage(@PathVariable(value = "id") Long id, @PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
 
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
@@ -154,26 +153,6 @@ public class FicheController
 
         return pages;
     }
-
-
-//    @RequestMapping(value = "/fiche", method =  RequestMethod.POST)
-//    public Assurances save(@Valid @RequestBody Assurances request) {
-//        return assurancesDao.save(request);
-//    }
-//
-//    @RequestMapping(value = "/assurance/{id}", method =  RequestMethod.PUT)
-//    public Assurances update(@Valid @RequestBody Profils request, @PathVariable("id") final Integer id) {
-//        Assurances assuranceInit = assurancesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-//        assuranceInit.setLibelle(request.getLibelle());
-//        return assurancesDao.save(assuranceInit);
-//    }
-
-//    @RequestMapping(value = "/assurance/{id}", method =  RequestMethod.DELETE)
-//    public void delete(@PathVariable("id") final Integer id) {
-//        Assurances assuranceInit = assurancesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-//        assuranceInit.setDeleted(true);
-//        this.assurancesDao.save(assuranceInit);
-//    }
     
     private Sort sortByCreatedDesc() {
         return Sort.by(Sort.Direction.DESC, new String[] { "createdAt" });

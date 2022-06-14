@@ -31,7 +31,7 @@ public class FileSystemStorageService implements StorageService
     
     @Autowired
     public FileSystemStorageService() {
-        this.path = "/home/upload/crm/pieces/";
+        this.path = Helpers.path_file;
         this.rootLocation = Paths.get(this.path);
     }
     

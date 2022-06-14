@@ -50,4 +50,24 @@ public class EntrepriseService implements EntreprisesDao {
     public Long countRecherche(String search) {
         return repository.countRecherche(search);
     }
+
+    @Override
+    public Boolean existsByRaisonSocial(String raisonSocial) {
+        return repository.existsByRaisonSocial(raisonSocial);
+    }
+
+    @Override
+    public Boolean existsByTelephone(String telephone) {
+        return repository.existsByTelephone(telephone);
+    }
+
+    @Override
+    public boolean existsByRaisonSocial(String raisonSocial, Long id) {
+        return repository.existsByRaisonSocial(raisonSocial, id);
+    }
+
+    @Override
+    public boolean existsByTelephone(String telephone, Long id) {
+        return repository.existsByTelephone(telephone, id);
+    }
 }

@@ -79,6 +79,11 @@ public class EncaissementService implements EncaissementsDao {
     }
 
     @Override
+    public Long count() {
+        return repository.count();
+    }
+
+    @Override
     public Double montantDate(Date startDate) {
         return repository.montantDate(startDate);
     }

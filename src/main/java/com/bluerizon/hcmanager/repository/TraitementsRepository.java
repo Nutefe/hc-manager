@@ -11,6 +11,7 @@ import java.util.List;
 public interface TraitementsRepository extends JpaRepository<Traitements, Integer> {
 
     List<Traitements> findByDeletedFalse();
+    List<Traitements> findByTypePatientAndDeletedFalse(TypePatients typePatient);
 
     List<Traitements> findByDeletedFalse(Pageable pageable);
 

@@ -56,6 +56,8 @@ public class Encaissements implements Serializable {
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateEncaissement;
+    @Column(name = "fileName")
+    private String fileName;
     @Version
     @Basic(optional = false)
     @Column(nullable = false)
@@ -142,6 +144,14 @@ public class Encaissements implements Serializable {
         this.dateEncaissement = dateEncaissement;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
     public int getVersion() {
         return version;
     }
@@ -183,18 +193,19 @@ public class Encaissements implements Serializable {
                 Objects.equals(utilisateur, that.utilisateur) && Objects.equals(facture, that.facture) &&
                 Objects.equals(total, that.total) && Objects.equals(montant, that.montant) &&
                 Objects.equals(reliquat, that.reliquat) && Objects.equals(reste, that.reste) &&
-                Objects.equals(dateEncaissement, that.dateEncaissement) && Objects.equals(createdAt, that.createdAt) &&
-                Objects.equals(updatedAt, that.updatedAt);
+                Objects.equals(dateEncaissement, that.dateEncaissement) && Objects.equals(fileName, that.fileName) &&
+                Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, utilisateur, facture, total, montant, reliquat, reste, dateEncaissement, version, deleted, createdAt, updatedAt);
+        return Objects.hash(id, utilisateur, facture, total, montant, reliquat, reste, dateEncaissement, fileName,
+                version, deleted, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
-        return "Encaissement{" +
+        return "Encaissements{" +
                 "id=" + id +
                 ", utilisateur=" + utilisateur +
                 ", facture=" + facture +
@@ -203,6 +214,7 @@ public class Encaissements implements Serializable {
                 ", reliquat=" + reliquat +
                 ", reste=" + reste +
                 ", dateEncaissement=" + dateEncaissement +
+                ", fileName='" + fileName + '\'' +
                 ", version=" + version +
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +

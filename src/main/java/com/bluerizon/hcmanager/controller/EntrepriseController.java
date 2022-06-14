@@ -11,6 +11,7 @@ import com.bluerizon.hcmanager.exception.NotFoundRequestException;
 import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Entreprises;
 import com.bluerizon.hcmanager.models.Profils;
+import com.bluerizon.hcmanager.models.Utilisateurs;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.EntreprisePage;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
@@ -184,6 +185,30 @@ public class EntrepriseController
         Entreprises entrepriseInit = this.entreprisesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         entrepriseInit.setDeleted(true);
         this.entreprisesDao.save(entrepriseInit);
+    }
+
+    @RequestMapping(value = { "/check/raison/social/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkRaisonSocial(@PathVariable("s") final String s) {
+        return this.entreprisesDao.existsByRaisonSocial(s);
+    }
+
+    @RequestMapping(value = { "/check/raison/social/update/{id}/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkRaisonSocialId(@PathVariable("s") final String s, @PathVariable("id") final Long id) {
+        return this.entreprisesDao.existsByRaisonSocial(s, id);
+    }
+
+    @RequestMapping(value = { "/check/telephone/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkTelephone(@PathVariable("s") final String s) {
+        return this.entreprisesDao.existsByTelephone(s);
+    }
+
+    @RequestMapping(value = { "/check/telephone/update/{id}/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkTelephoneId(@PathVariable("s") final String s, @PathVariable("id") final Long id) {
+        return this.entreprisesDao.existsByTelephone(s, id);
     }
     
     private Sort sortByCreatedDesc() {

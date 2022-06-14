@@ -35,6 +35,8 @@ public interface EncaissementsDao {
 
     Long countRecherche(final Date dateEncaissement, String search);
 
+    Long count();
+
     Double montantDate(final Date startDate);
 
 }

@@ -1,6 +1,7 @@
 package com.bluerizon.hcmanager.dao;
 
 import com.bluerizon.hcmanager.models.Traitements;
+import com.bluerizon.hcmanager.models.TypePatients;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,6 +15,7 @@ public interface TraitementsDao {
     Traitements save(Traitements traitement);
 
     List<Traitements> findByDeletedFalse();
+    List<Traitements> findByTypePatientAndDeletedFalse(TypePatients typePatient);
 
     List<Traitements> findByDeletedFalse(Pageable pageable);
 

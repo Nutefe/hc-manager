@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableAutoConfiguration
 @EnableScheduling
 public class HcManagerApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(HcManagerApplication.class, args);
 	}

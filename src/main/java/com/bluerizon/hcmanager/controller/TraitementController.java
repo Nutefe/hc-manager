@@ -7,6 +7,7 @@ package com.bluerizon.hcmanager.controller;
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.models.Patients;
 import com.bluerizon.hcmanager.models.Traitements;
+import com.bluerizon.hcmanager.models.TypePatients;
 import com.bluerizon.hcmanager.payload.pages.PatientPage;
 import com.bluerizon.hcmanager.payload.pages.TraitementPage;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
@@ -44,6 +45,8 @@ public class TraitementController
     private UtilisateursDao utilisateursDao;
     @Autowired
     private TypeTraitementsDao typeTraitementsDao;
+    @Autowired
+    private TypePatientsDao typePatientsDao;
 
     @GetMapping("/traitement/{id}")
     public Traitements getOne(@PathVariable("id") final Integer id) {
@@ -54,6 +57,13 @@ public class TraitementController
     @GetMapping("/traitements")
     public List<Traitements> getAll() {
         List<Traitements> traitements= this.traitementsDao.findByDeletedFalse();
+        return traitements;
+    }
+
+    @GetMapping("/traitements/type/patient/{id}")
+    public List<Traitements> getAll(@PathVariable("id") final Integer id) {
+        TypePatients patient = this.typePatientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        List<Traitements> traitements= this.traitementsDao.findByTypePatientAndDeletedFalse(patient);
         return traitements;
     }
 

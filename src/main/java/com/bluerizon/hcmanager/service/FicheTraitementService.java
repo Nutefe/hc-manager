@@ -29,4 +29,9 @@ public class FicheTraitementService implements FicheTraitementsDao {
     public List<FicheTraitements> findByFiche(Fiches fiche) {
         return repository.findByFiche(fiche);
     }
+
+    @Override
+    public void delete(List<FicheTraitements> ficheTraitements) {
+        repository.deleteAll(ficheTraitements);
+    }
 }

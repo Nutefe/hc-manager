@@ -14,15 +14,24 @@ import com.bluerizon.hcmanager.payload.request.FactureRequest;
 import com.bluerizon.hcmanager.payload.request.TraitementRequest;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
 import com.bluerizon.hcmanager.security.services.UserDetailsImpl;
+import com.bluerizon.hcmanager.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,9 +77,15 @@ public class FactureController
     private PatientsDao patientsDao;
     @Autowired
     private KotasDao kotasDao;
-
     @Autowired
     private FicheTraitementsDao ficheTraitementsDao;
+    private final Logger logger;
+    @Autowired
+    private StorageService fileStorageService;
+
+    public FactureController() {
+        this.logger = LoggerFactory.getLogger((Class)this.getClass());
+    }
 
     @GetMapping("/facture/{id}")
     public Factures getOne(@PathVariable("id") final Long id) {
@@ -389,8 +404,10 @@ public class FactureController
     }
 
 
-    @RequestMapping(value = "/facture", method =  RequestMethod.POST)
-    public void save(@Valid @RequestBody FactureRequest request, @CurrentUser final UserDetailsImpl currentUser) throws IOException {
+    @RequestMapping(value = "/facture", method =  RequestMethod.POST, produces = "application/pdf")
+    public ResponseEntity<Resource> save(@Valid @RequestBody FactureRequest request,
+                                         @CurrentUser final UserDetailsImpl currentUser,
+                                         final HttpServletRequest requestServlet) throws IOException {
 
         Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         Patients patient = this.patientsDao.findById(request.getPatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
@@ -452,27 +469,158 @@ public class FactureController
         facture.setUtilisateur(utilisateur);
         facture.setDateFacture(new Date());
         facture.setTotal(total);
-        if (request.getAccompte() > (total - request.getRemise()))
+        if (request.getAccompte() >= (total - request.getRemise()))
             facture.setAcompte(0.0);
         else
             facture.setAcompte(request.getAccompte());
         facture.setRemise(request.getRemise());
         facture.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1));
-        facture.setReste(total - request.getRemise());
+        if (request.getAccompte() > 0 && request.getAccompte() < (total - request.getRemise()))
+            facture.setReste(total - (request.getRemise() + request.getAccompte()));
+        else
+            facture.setReste(0.0);
         Factures factureSave = this.facturesDao.save(facture);
-        GenarateFacture.myPdfHelloWordClientMoral(factureSave, traitementSave);
+        File bis = null;
+        if (factureSave.getFiche().getPatient().getTypePatient().getId() == 1){
+            bis = GenarateFacture.inamPdf(factureSave, traitementSave);
+        } else if (factureSave.getFiche().getPatient().getTypePatient().getId() == 2) {
+            bis = GenarateFacture.autrePdf(factureSave, traitementSave);
+        } else if (factureSave.getFiche().getPatient().getTypePatient().getId() == 3) {
+            bis = GenarateFacture.nonPdf(factureSave, traitementSave);
+        }
+
+        final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = requestServlet.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentLength(bis.length()) //
+                .body(resource);
         //return this.facturesDao.save(request);
     }
 
-//    @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.PUT)
-//    public Entreprises update(@Valid @RequestBody Entreprises request, @PathVariable("id") final Long id) {
-//        Entreprises entrepriseInit = this.entreprisesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-//        entrepriseInit.setRaisonSocial(request.getRaisonSocial());
-//        entrepriseInit.setNif(request.getNif());
-//        entrepriseInit.setTelephone(request.getTelephone());
-//        entrepriseInit.setAdresse(request.getAdresse());
-//        return this.entreprisesDao.save(entrepriseInit);
-//    }
+    @RequestMapping(value = "/facture/{id}", method =  RequestMethod.PUT, produces = "application/pdf")
+    public ResponseEntity<Resource> update(@Valid @RequestBody FactureRequest request,
+                                         @CurrentUser final UserDetailsImpl currentUser,
+                                           @PathVariable("id") final Long id,
+                                         final HttpServletRequest requestServlet) throws IOException {
+
+        Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Patients patient = this.patientsDao.findById(request.getPatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Factures factureInit = this.facturesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Fiches fiche = factureInit.getFiche();
+        fiche.setUtilisateur(utilisateur);
+        fiche.setPatient(patient);
+        fiche.setDateFiche(new Date());
+        Fiches ficheSave = this.fichesDao.save(fiche);
+        List<FicheTraitements> ficheTraitementInit = this.ficheTraitementsDao.findByFiche(ficheSave);
+        this.ficheTraitementsDao.delete(ficheTraitementInit);
+        List<FicheTraitements> ficheTraitements = new ArrayList<>();
+        Double total = 0.0;
+        for (TraitementRequest item :
+                request.getTraitements()) {
+
+            FicheTraitements traitement = new FicheTraitements();
+            Traitements traitementInit = this.traitementsDao.findById(item.getTraitement().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+            traitement.setFicheTraitementPK(new FicheTraitementPK(ficheSave, traitementInit));
+            traitement.setBaseRembours(item.getBaseRembour());
+            if (!item.getKota().trim().equals("") || item.getKota() != null){
+                if (kotasDao.existsByLibelle(item.getKota())){
+                    traitement.setKota(this.kotasDao.findByLibelleAndDeletedFalse(item.getKota()));
+                }else {
+                    Kotas kota = new Kotas();
+                    kota.setLibelle(item.getKota());
+                    Kotas kotaSave = this.kotasDao.save(kota);
+                    traitement.setKota(kotaSave);
+                }
+            }
+            traitement.setUnite(request.isUnite());
+            if (traitementInit.getTypePatient().getId() == 1){
+                if (request.isUnite() == false){
+                    Double netAss = (traitementInit.getPrice() * item.getNetAssurance())/100;
+                    traitement.setNetPayAssu(netAss);
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
+                } else {
+                    traitement.setNetPayAssu(item.getNetAssurance());
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
+                }
+            } else if (traitementInit.getTypePatient().getId() == 2) {
+                if (request.isUnite() == false){
+                    Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
+                    traitement.setNetPayAssu(netAss);
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
+                } else {
+                    traitement.setNetPayAssu(item.getBaseRembour());
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
+                }
+            }
+            total += traitement.getNetPayBeneficiaire();
+            ficheTraitements.add(traitement);
+        }
+        List<FicheTraitements> traitementSave = this.ficheTraitementsDao.saveAll(ficheTraitements);
+        Factures facture = new Factures();
+        facture.setNumero(this.facturesDao.count()+11+"");
+        facture.setFiche(ficheSave);
+        facture.setUtilisateur(utilisateur);
+        facture.setDateFacture(new Date());
+        facture.setTotal(total);
+        if (request.getAccompte() >= (total - request.getRemise()))
+            facture.setAcompte(0.0);
+        else
+            facture.setAcompte(request.getAccompte());
+        facture.setRemise(request.getRemise());
+        facture.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1));
+        if (request.getAccompte() > 0 && request.getAccompte() < (total - request.getRemise()))
+            facture.setReste(total - (request.getRemise() + request.getAccompte()));
+        else
+            facture.setReste(0.0);
+        Factures factureSave = this.facturesDao.save(facture);
+        File bis = null;
+        if (factureSave.getFiche().getPatient().getTypePatient().getId() == 1){
+            bis = GenarateFacture.inamPdf(factureSave, traitementSave);
+        } else if (factureSave.getFiche().getPatient().getTypePatient().getId() == 2) {
+            bis = GenarateFacture.autrePdf(factureSave, traitementSave);
+        } else if (factureSave.getFiche().getPatient().getTypePatient().getId() == 3) {
+            bis = GenarateFacture.nonPdf(factureSave, traitementSave);
+        }
+
+        final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = requestServlet.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentLength(bis.length()) //
+                .body(resource);
+        //return this.facturesDao.save(request);
+    }
 
     @RequestMapping(value = "/facture/{id}", method =  RequestMethod.DELETE)
     public void delete(@PathVariable("id") final Long id) {

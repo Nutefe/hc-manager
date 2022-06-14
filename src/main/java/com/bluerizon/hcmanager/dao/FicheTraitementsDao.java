@@ -13,4 +13,6 @@ public interface FicheTraitementsDao {
 
     List<FicheTraitements> findByFiche(final Fiches fiche);
 
+    void delete(final List<FicheTraitements> ficheTraitements);
+
 }
