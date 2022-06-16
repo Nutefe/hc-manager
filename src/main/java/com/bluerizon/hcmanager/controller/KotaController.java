@@ -158,13 +158,14 @@ public class KotaController
 
     @RequestMapping(value = "/kota", method =  RequestMethod.POST)
     public Kotas save(@Valid @RequestBody Kotas request) {
+        request.setLibelle(request.getLibelle().toUpperCase());
         return this.kotasDao.save(request);
     }
 
     @RequestMapping(value = "/kota/{id}", method =  RequestMethod.PUT)
     public Kotas update(@Valid @RequestBody Kotas request, @PathVariable("id") final Integer id) {
         Kotas kotaInit = this.kotasDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        kotaInit.setLibelle(request.getLibelle());
+        kotaInit.setLibelle(request.getLibelle().toUpperCase());
         return this.kotasDao.save(kotaInit);
     }
 

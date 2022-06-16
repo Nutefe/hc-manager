@@ -324,8 +324,6 @@ public class UtilisateurController
         utilisateursDao.save(utilisateur);
     }
 
-
-
     @RequestMapping(value = { "/check/username/{s}" }, method = { RequestMethod.GET })
     @ResponseStatus(HttpStatus.OK)
     public Boolean checkUsername(@PathVariable("s") final String s) {

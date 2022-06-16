@@ -159,13 +159,14 @@ public class TypeTraitementController
 
     @RequestMapping(value = "/type/traitement", method =  RequestMethod.POST)
     public TypeTraitements save(@Valid @RequestBody TypeTraitements request) {
+        request.setLibelle(request.getLibelle().toUpperCase());
         return this.typeTraitementsDao.save(request);
     }
 
     @RequestMapping(value = "/type/traitement/{id}", method =  RequestMethod.PUT)
     public TypeTraitements update(@Valid @RequestBody TypeTraitements request, @PathVariable("id") final Integer id) {
         TypeTraitements traitementInit = this.typeTraitementsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        traitementInit.setLibelle(request.getLibelle());
+        traitementInit.setLibelle(request.getLibelle().toUpperCase());
         return this.typeTraitementsDao.save(traitementInit);
     }
 

@@ -4,10 +4,7 @@
 
 package com.bluerizon.hcmanager.controller;
 
-import com.bluerizon.hcmanager.dao.AssurancesDao;
-import com.bluerizon.hcmanager.dao.PatientsDao;
-import com.bluerizon.hcmanager.dao.TypePatientsDao;
-import com.bluerizon.hcmanager.dao.UtilisateursDao;
+import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Patients;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
@@ -49,6 +46,8 @@ public class PatientController
     private TypePatientsDao typePatientsDao;
     @Autowired
     private AssurancesDao assurancesDao;
+    @Autowired
+    private EntreprisesDao entreprisesDao;
 
     @GetMapping("/patient/{id}")
     public Patients getOne(@PathVariable("id") final Long id) {
@@ -167,9 +166,19 @@ public class PatientController
 
     @RequestMapping(value = "/patient", method =  RequestMethod.POST)
     public Patients save(@Valid @RequestBody Patients request, @CurrentUser final UserDetailsImpl currentUser) {
-        request.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        System.out.println(request);
+        if (request.getAssurance().getId() != null)
+            request.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        else
+            request.setAssurance(null);
         request.setTypePatient(this.typePatientsDao.findById(request.getTypePatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        if (request.getEntreprise().getId() != null)
+            request.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        else
+            request.setEntreprise(null);
+        request.setNom(request.getNom().toUpperCase());
+        request.setGenre(request.getGenre().toUpperCase());
         return this.patientsDao.save(request);
     }
 
@@ -178,13 +187,14 @@ public class PatientController
         Patients patientInit = this.patientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         patientInit.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         patientInit.setTypePatient(this.typePatientsDao.findById(request.getTypePatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        patientInit.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         patientInit.setCodeDossier(request.getCodeDossier());
-        patientInit.setNom(request.getNom());
+        patientInit.setNom(request.getNom().toUpperCase());
         patientInit.setPrenom(request.getPrenom());
         patientInit.setAdresse(request.getAdresse());
         patientInit.setDateNaiss(request.getDateNaiss());
         patientInit.setNumeroPiece(request.getNumeroPiece());
-        patientInit.setSexe(request.isSexe());
+        patientInit.setGenre(request.getGenre().toUpperCase());
         patientInit.setPieceExp(request.getPieceExp());
         patientInit.setTelephone(request.getTelephone());
         return this.patientsDao.save(patientInit);
@@ -195,6 +205,18 @@ public class PatientController
         Patients patientInit = this.patientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         patientInit.setDeleted(true);
         this.patientsDao.save(patientInit);
+    }
+
+    @RequestMapping(value = { "/check/code/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkCode(@PathVariable("s") final String s) {
+        return this.patientsDao.existsByCodeDossier(s);
+    }
+
+    @RequestMapping(value = { "/check/code/update/{id}/{s}" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean checkCodeId(@PathVariable("s") final String s, @PathVariable("id") final Long id) {
+        return this.patientsDao.existsByCodeDossier(s, id);
     }
     
     private Sort sortByCreatedDesc() {

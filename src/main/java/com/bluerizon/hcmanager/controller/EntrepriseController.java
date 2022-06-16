@@ -167,13 +167,14 @@ public class EntrepriseController
     @RequestMapping(value = "/entreprise", method =  RequestMethod.POST)
     public Entreprises save(@Valid @RequestBody Entreprises request, @CurrentUser final UserDetailsImpl currentUser) {
         request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new NotFoundRequestException("Error: object is not found.")));
+        request.setRaisonSocial(request.getRaisonSocial().toUpperCase());
         return this.entreprisesDao.save(request);
     }
 
     @RequestMapping(value = "/entreprise/{id}", method =  RequestMethod.PUT)
     public Entreprises update(@Valid @RequestBody Entreprises request, @PathVariable("id") final Long id) {
         Entreprises entrepriseInit = this.entreprisesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        entrepriseInit.setRaisonSocial(request.getRaisonSocial());
+        entrepriseInit.setRaisonSocial(request.getRaisonSocial().toUpperCase());
         entrepriseInit.setNif(request.getNif());
         entrepriseInit.setTelephone(request.getTelephone());
         entrepriseInit.setAdresse(request.getAdresse());

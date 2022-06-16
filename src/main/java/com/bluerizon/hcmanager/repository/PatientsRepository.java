@@ -5,6 +5,7 @@ import com.bluerizon.hcmanager.models.Traitements;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -41,5 +42,11 @@ public interface PatientsRepository extends JpaRepository<Patients, Long> {
             " p.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (p.deleted = false)")
     Long countRecherche(String search);
+
+    Boolean existsByCodeDossier(String codeDossier);
+
+    @Query("SELECT CASE WHEN COUNT(codeDossier) > 0 THEN true ELSE false END FROM Patients p WHERE p.codeDossier = :code and p.id != :id")
+    boolean existsByCodeDossier(@Param("code") final String code, @Param("id") final Long id);
+
 
 }

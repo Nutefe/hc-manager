@@ -156,13 +156,14 @@ public class TypePatientController
 
     @RequestMapping(value = "/type/patient", method =  RequestMethod.POST)
     public TypePatients save(@Valid @RequestBody TypePatients request) {
+        request.setLibelle(request.getLibelle().toUpperCase());
         return this.patientsDao.save(request);
     }
 
     @RequestMapping(value = "/type/patient/{id}", method =  RequestMethod.PUT)
     public TypePatients update(@Valid @RequestBody TypeTraitements request, @PathVariable("id") final Integer id) {
         TypePatients patientInit = this.patientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        patientInit.setLibelle(request.getLibelle());
+        patientInit.setLibelle(request.getLibelle().toUpperCase());
         return this.patientsDao.save(patientInit);
     }
 

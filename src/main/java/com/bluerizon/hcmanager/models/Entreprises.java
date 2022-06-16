@@ -36,7 +36,7 @@ public class Entreprises implements Serializable
     private String raisonSocial;
     @Column(name = "nif")
     private String nif;
-    @Column(name = "telephone", unique = true, length = 50)
+    @Column(name = "telephone", length = 50)
     private String telephone;
     @Column(name = "adresse", length = 150)
     private String adresse;

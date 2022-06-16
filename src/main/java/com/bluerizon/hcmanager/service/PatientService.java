@@ -50,4 +50,14 @@ public class PatientService implements PatientsDao {
     public Long countRecherche(String search) {
         return repository.countRecherche(search);
     }
+
+    @Override
+    public Boolean existsByCodeDossier(String codeDossier) {
+        return repository.existsByCodeDossier(codeDossier);
+    }
+
+    @Override
+    public boolean existsByCodeDossier(String code, Long id) {
+        return repository.existsByCodeDossier(code, id);
+    }
 }

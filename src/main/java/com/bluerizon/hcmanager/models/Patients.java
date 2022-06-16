@@ -41,6 +41,9 @@ public class Patients implements Serializable
     @JoinColumn(name = "assurance", referencedColumnName = "id")
     @ManyToOne
     private Assurances assurance;
+    @JoinColumn(name = "entreprise", referencedColumnName = "id")
+    @ManyToOne
+    private Entreprises entreprise;
     @Column(name = "nom", nullable = false, length = 50)
     private String nom;
     @Column(name = "prenom", nullable = false, length = 80)
@@ -48,8 +51,8 @@ public class Patients implements Serializable
     @Column(name = "dateNaiss")
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateNaiss;
-    @Column(name = "sexe", nullable = false)
-    private boolean sexe;
+    @Column(name = "genre", nullable = false)
+    private String genre;
     @Column(name = "telephone", nullable = false, length = 50)
     private String telephone;
     @Column(name = "adresse", nullable = false, length = 150)
@@ -123,6 +126,14 @@ public class Patients implements Serializable
         this.typePatient = typePatient;
     }
 
+    public Entreprises getEntreprise() {
+        return entreprise;
+    }
+
+    public void setEntreprise(Entreprises entreprise) {
+        this.entreprise = entreprise;
+    }
+
     public String getNom() {
         return nom;
     }
@@ -147,12 +158,12 @@ public class Patients implements Serializable
         this.dateNaiss = dateNaiss;
     }
 
-    public boolean isSexe() {
-        return sexe;
+    public String getGenre() {
+        return genre;
     }
 
-    public void setSexe(boolean sexe) {
-        this.sexe = sexe;
+    public void setGenre(String genre) {
+        this.genre = genre;
     }
 
     public String getTelephone() {
@@ -224,12 +235,21 @@ public class Patients implements Serializable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Patients patients = (Patients) o;
-        return sexe == patients.sexe && deleted == patients.deleted && version == patients.version && Objects.equals(id, patients.id) && Objects.equals(codeDossier, patients.codeDossier) && Objects.equals(utilisateur, patients.utilisateur) && Objects.equals(typePatient, patients.typePatient) && Objects.equals(assurance, patients.assurance) && Objects.equals(nom, patients.nom) && Objects.equals(prenom, patients.prenom) && Objects.equals(dateNaiss, patients.dateNaiss) && Objects.equals(telephone, patients.telephone) && Objects.equals(adresse, patients.adresse) && Objects.equals(numeroPiece, patients.numeroPiece) && Objects.equals(pieceExp, patients.pieceExp) && Objects.equals(createdAt, patients.createdAt) && Objects.equals(updatedAt, patients.updatedAt);
+        return deleted == patients.deleted && version == patients.version && Objects.equals(id, patients.id) &&
+                Objects.equals(codeDossier, patients.codeDossier) && Objects.equals(utilisateur, patients.utilisateur) &&
+                Objects.equals(typePatient, patients.typePatient) && Objects.equals(assurance, patients.assurance) &&
+                Objects.equals(entreprise, patients.entreprise) && Objects.equals(nom, patients.nom) &&
+                Objects.equals(prenom, patients.prenom) && Objects.equals(dateNaiss, patients.dateNaiss) &&
+                Objects.equals(genre, patients.genre) && Objects.equals(telephone, patients.telephone) &&
+                Objects.equals(adresse, patients.adresse) && Objects.equals(numeroPiece, patients.numeroPiece) &&
+                Objects.equals(pieceExp, patients.pieceExp) && Objects.equals(createdAt, patients.createdAt) &&
+                Objects.equals(updatedAt, patients.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, codeDossier, utilisateur, typePatient, assurance, nom, prenom, dateNaiss, sexe, telephone, adresse, numeroPiece, pieceExp, deleted, version, createdAt, updatedAt);
+        return Objects.hash(id, codeDossier, utilisateur, typePatient, assurance, entreprise, nom, prenom, dateNaiss,
+                genre, telephone, adresse, numeroPiece, pieceExp, deleted, version, createdAt, updatedAt);
     }
 
     @Override
@@ -240,10 +260,11 @@ public class Patients implements Serializable
                 ", utilisateur=" + utilisateur +
                 ", typePatient=" + typePatient +
                 ", assurance=" + assurance +
+                ", entreprise=" + entreprise +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", dateNaiss=" + dateNaiss +
-                ", sexe=" + sexe +
+                ", genre=" + genre +
                 ", telephone='" + telephone + '\'' +
                 ", adresse='" + adresse + '\'' +
                 ", numeroPiece='" + numeroPiece + '\'' +

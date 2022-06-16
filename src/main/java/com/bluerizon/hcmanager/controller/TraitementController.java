@@ -174,6 +174,7 @@ public class TraitementController
     public Traitements save(@Valid @RequestBody Traitements request, @CurrentUser final UserDetailsImpl currentUser) {
         request.setTypeTraitement(this.typeTraitementsDao.findById(request.getTypeTraitement().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setLibelle(request.getLibelle().toUpperCase());
         return this.traitementsDao.save(request);
     }
 
@@ -181,7 +182,7 @@ public class TraitementController
     public Traitements update(@Valid @RequestBody Traitements request, @PathVariable("id") final Integer id) {
         Traitements traitementInit = this.traitementsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         traitementInit.setTypeTraitement(this.typeTraitementsDao.findById(request.getTypeTraitement().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
-        traitementInit.setLibelle(request.getLibelle());
+        traitementInit.setLibelle(request.getLibelle().toUpperCase());
         traitementInit.setDescription(request.getDescription());
         traitementInit.setPrice(request.getPrice());
         return this.traitementsDao.save(traitementInit);

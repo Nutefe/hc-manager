@@ -159,13 +159,14 @@ public class AssuranceController
 
     @RequestMapping(value = "/assurance", method =  RequestMethod.POST)
     public Assurances save(@Valid @RequestBody Assurances request) {
+        request.setLibelle(request.getLibelle().toUpperCase());
         return assurancesDao.save(request);
     }
 
     @RequestMapping(value = "/assurance/{id}", method =  RequestMethod.PUT)
     public Assurances update(@Valid @RequestBody Assurances request, @PathVariable("id") final Integer id) {
         Assurances assuranceInit = assurancesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        assuranceInit.setLibelle(request.getLibelle());
+        assuranceInit.setLibelle(request.getLibelle().toUpperCase());
         return assurancesDao.save(assuranceInit);
     }
 
