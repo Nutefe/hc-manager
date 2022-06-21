@@ -53,6 +53,11 @@ public class AssuranceController
         List<Assurances> assurances= assurancesDao.findByDeletedFalse();
         return assurances;
     }
+    @GetMapping("/assurances/autre")
+    public List<Assurances> getAllAutre() {
+        List<Assurances> assurances= assurancesDao.findAssurerAutre();
+        return assurances;
+    }
 
 
     @RequestMapping(value ="/assurances/page/{page}", method = RequestMethod.GET)

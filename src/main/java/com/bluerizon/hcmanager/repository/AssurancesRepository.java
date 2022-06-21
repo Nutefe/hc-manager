@@ -23,4 +23,8 @@ public interface AssurancesRepository extends JpaRepository<Assurances, Integer>
     @Query("SELECT COUNT(a) FROM Assurances a WHERE (a.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (a.deleted = false)")
     Long countRecherche(String search);
+
+    @Query("SELECT a FROM Assurances a WHERE a.deleted = false AND a.id !=1")
+    List<Assurances> findAssurerAutre();
+
 }

@@ -166,12 +166,32 @@ public class PatientController
 
     @RequestMapping(value = "/patient", method =  RequestMethod.POST)
     public Patients save(@Valid @RequestBody Patients request, @CurrentUser final UserDetailsImpl currentUser) {
-        System.out.println(request);
-        if (request.getAssurance().getId() != null)
-            request.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+
+        request.setAssurance(null);
+        request.setEntreprise(null);
+        request.setTypePatient(this.typePatientsDao.findById(3).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setNom(request.getNom().toUpperCase());
+        request.setGenre(request.getGenre().toUpperCase());
+        return this.patientsDao.save(request);
+    }
+    @RequestMapping(value = "/patient/assurer/inam", method =  RequestMethod.POST)
+    public Patients savePatientInam(@Valid @RequestBody Patients request, @CurrentUser final UserDetailsImpl currentUser) {
+        request.setAssurance(this.assurancesDao.findById(1).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setTypePatient(this.typePatientsDao.findById(1).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        if (request.getEntreprise().getId() != null)
+            request.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         else
-            request.setAssurance(null);
-        request.setTypePatient(this.typePatientsDao.findById(request.getTypePatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+            request.setEntreprise(null);
+        request.setNom(request.getNom().toUpperCase());
+        request.setGenre(request.getGenre().toUpperCase());
+        return this.patientsDao.save(request);
+    }
+    @RequestMapping(value = "/patient/assurer/autre", method =  RequestMethod.POST)
+    public Patients savePatientAutre(@Valid @RequestBody Patients request, @CurrentUser final UserDetailsImpl currentUser) {
+        request.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        request.setTypePatient(this.typePatientsDao.findById(2).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         request.setUtilisateur(this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         if (request.getEntreprise().getId() != null)
             request.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
@@ -185,9 +205,18 @@ public class PatientController
     @RequestMapping(value = "/patient/{id}", method =  RequestMethod.PUT)
     public Patients update(@Valid @RequestBody Patients request, @PathVariable("id") final Long id) {
         Patients patientInit = this.patientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        patientInit.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
-        patientInit.setTypePatient(this.typePatientsDao.findById(request.getTypePatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
-        patientInit.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        if (request.getAssurance().getId() != null)
+            patientInit.setAssurance(this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        else
+            patientInit.setAssurance(null);
+        if (request.getTypePatient().getId() != null)
+            patientInit.setTypePatient(this.typePatientsDao.findById(request.getTypePatient().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        else
+            patientInit.setTypePatient(null);
+        if (request.getEntreprise().getId() != null)
+            patientInit.setEntreprise(this.entreprisesDao.findById(request.getEntreprise().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
+        else
+            patientInit.setEntreprise(null);
         patientInit.setCodeDossier(request.getCodeDossier());
         patientInit.setNom(request.getNom().toUpperCase());
         patientInit.setPrenom(request.getPrenom());

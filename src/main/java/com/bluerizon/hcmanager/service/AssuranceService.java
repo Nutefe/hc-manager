@@ -50,4 +50,9 @@ public class AssuranceService implements AssurancesDao {
     public Long countRecherche(String search) {
         return repository.countRecherche(search);
     }
+
+    @Override
+    public List<Assurances> findAssurerAutre() {
+        return repository.findAssurerAutre();
+    }
 }

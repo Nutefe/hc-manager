@@ -197,6 +197,7 @@ public class EntrepriseController
     @RequestMapping(value = { "/check/raison/social/update/{id}/{s}" }, method = { RequestMethod.GET })
     @ResponseStatus(HttpStatus.OK)
     public Boolean checkRaisonSocialId(@PathVariable("s") final String s, @PathVariable("id") final Long id) {
+        System.out.println(this.entreprisesDao.existsByRaisonSocial(s, id));
         return this.entreprisesDao.existsByRaisonSocial(s, id);
     }
 

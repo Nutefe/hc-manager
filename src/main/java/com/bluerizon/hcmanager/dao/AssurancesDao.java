@@ -22,5 +22,6 @@ public interface AssurancesDao{
     Long countAssurances();
 
     Long countRecherche(String search);
+    List<Assurances> findAssurerAutre();
 
 }

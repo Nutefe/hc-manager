@@ -4,9 +4,11 @@
 
 package com.bluerizon.hcmanager.initializ;
 
+import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Profils;
 import com.bluerizon.hcmanager.models.TypePatients;
 import com.bluerizon.hcmanager.models.Utilisateurs;
+import com.bluerizon.hcmanager.repository.AssurancesRepository;
 import com.bluerizon.hcmanager.repository.ProfilsRepository;
 import com.bluerizon.hcmanager.repository.TypePatientsRepository;
 import com.bluerizon.hcmanager.repository.UtilisateursRepository;
@@ -28,16 +30,19 @@ public class DbInitializer implements CommandLineRunner
     private UtilisateursRepository utilisateursRepository;
     private ProfilsRepository profilsRepository;
     private TypePatientsRepository typePatientsRepository;
+    private AssurancesRepository assurancesRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
     
     public DbInitializer(UtilisateursRepository utilisateursRepository,
                          ProfilsRepository profilsRepository,
-                         TypePatientsRepository typePatientsRepository) {
+                         TypePatientsRepository typePatientsRepository,
+                         AssurancesRepository assurancesRepository) {
         this.utilisateursRepository = utilisateursRepository;
         this.profilsRepository = profilsRepository;
         this.typePatientsRepository = typePatientsRepository;
+        this.assurancesRepository = assurancesRepository;
     }
     
     public void run(final String... args) throws Exception {
@@ -117,6 +122,13 @@ public class DbInitializer implements CommandLineRunner
             typePatientsList.add(typePatient2);
             typePatientsList.add(typePatient3);
             this.typePatientsRepository.saveAll(typePatientsList);
+        }
+        if (this.assurancesRepository.count() <= 0){
+            Assurances assurance = new Assurances();
+            assurance.setLibelle("INAM");
+            List<Assurances> assurancesList = new ArrayList<>();
+            assurancesList.add(assurance);
+            this.assurancesRepository.saveAll(assurancesList);
         }
 
         System.out.println(" -- Database has been initialized");
