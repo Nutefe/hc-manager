@@ -15,6 +15,10 @@ public interface PatientsRepository extends JpaRepository<Patients, Long> {
     List<Patients> findByDeletedFalse();
 
     List<Patients> findByDeletedFalse(Pageable pageable);
+    @Query("SELECT p FROM Patients p WHERE p.deleted = false AND p.typePatient = 3")
+    List<Patients> selectPatientNonAssurer();
+    @Query("SELECT p FROM Patients p WHERE p.deleted = false AND p.typePatient != 3")
+    List<Patients> selectPatientAssurer();
 
     @Query("SELECT p FROM Patients p WHERE (p.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " p.nom LIKE CONCAT('%',:search,'%') OR " +

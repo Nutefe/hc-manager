@@ -60,4 +60,14 @@ public class PatientService implements PatientsDao {
     public boolean existsByCodeDossier(String code, Long id) {
         return repository.existsByCodeDossier(code, id);
     }
+
+    @Override
+    public List<Patients> selectPatientNonAssurer() {
+        return repository.selectPatientNonAssurer();
+    }
+
+    @Override
+    public List<Patients> selectPatientAssurer() {
+        return repository.selectPatientAssurer();
+    }
 }

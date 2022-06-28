@@ -27,5 +27,7 @@ public interface PatientsDao {
     Boolean existsByCodeDossier(String codeDossier);
 
     boolean existsByCodeDossier(final String code, final Long id);
+    List<Patients> selectPatientNonAssurer();
+    List<Patients> selectPatientAssurer();
 
 }

@@ -61,6 +61,16 @@ public class PatientController
         return patients;
     }
 
+    @GetMapping("/patients/assurer")
+    public List<Patients> getAllPatientAssurer() {
+        List<Patients> patients= this.patientsDao.selectPatientAssurer();
+        return patients;
+    }@GetMapping("/patients/non/assurer")
+    public List<Patients> getAllNonAssurer() {
+        List<Patients> patients= this.patientsDao.selectPatientNonAssurer();
+        return patients;
+    }
+
 
     @RequestMapping(value ="/patients/page/{page}", method = RequestMethod.GET)
     @ResponseBody

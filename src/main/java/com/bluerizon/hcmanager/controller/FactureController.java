@@ -404,7 +404,7 @@ public class FactureController
     }
 
 
-    @RequestMapping(value = "/facture", method =  RequestMethod.POST, produces = "application/pdf")
+    @RequestMapping(value = "/facture", method =  RequestMethod.POST)
     public ResponseEntity<Resource> save(@Valid @RequestBody FactureRequest request,
                                          @CurrentUser final UserDetailsImpl currentUser,
                                          final HttpServletRequest requestServlet) throws IOException {
@@ -458,7 +458,12 @@ public class FactureController
                     traitement.setBaseRembours(item.getBaseRembour());
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
                 }
+            }else if (traitementInit.getTypePatient().getId() == 3) {
+                traitement.setNetPayAssu(0.0);
+                traitement.setBaseRembours(item.getBaseRembour());
+                traitement.setNetPayBeneficiaire(traitementInit.getPrice());
             }
+
             total += traitement.getNetPayBeneficiaire();
             ficheTraitements.add(traitement);
         }
