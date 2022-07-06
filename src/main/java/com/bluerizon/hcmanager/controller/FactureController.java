@@ -301,6 +301,106 @@ public class FactureController
 
         return pages;
     }
+    @RequestMapping(value ="/factures/not/solde/page/{page}", method = RequestMethod.GET)
+    @ResponseBody
+    public FacturePage selectAllNotSoldePage(@PathVariable(value = "page") int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
+
+        List<Factures> factures = this.facturesDao.findByDeletedFalseAndSoldeFalse(pageable);
+
+        FacturePage pages = new FacturePage();
+
+        Long total = this.facturesDao.countFacturesSoldeFalse();
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+            if (total % page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_facture_solde_page+1);
+            pages.setLast_page_url(url_facture_solde_page+lastPage);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_facture_solde_page+(page+1));
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_facture_solde_page+(page-1));
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+            pages.setPath(path);
+            pages.setData(factures);
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
+
+    @RequestMapping(value = "/factures/not/solde/search/page/{page}/{s}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public FacturePage searchNotSoldePage(@PathVariable(value = "page") int page,
+                                                   @PathVariable(value = "s") String s){
+
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
+        List<Factures> factures = this.facturesDao.rechercheSoldeFalse( s, pageable);
+
+        FacturePage pages = new FacturePage();
+        Long total = this.facturesDao.countRechercheSoldeFalse( s);
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+
+            if (total %page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_facture_solde_search_page+1+"/"+s);
+            pages.setLast_page_url(url_facture_solde_search_page+lastPage+"/"+s);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_facture_solde_search_page+(page+1)+"/"+s);
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_facture_solde_search_page+(page-1)+"/"+s);
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+
+            pages.setPath(path);
+            pages.setData(factures);
+
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
 
     @RequestMapping(value ="/factures/enc/page/{page}", method = RequestMethod.GET)
     @ResponseBody
@@ -438,7 +538,7 @@ public class FactureController
             traitement.setUnite(request.isUnite());
             if (traitementInit.getTypePatient().getId() == 1){
                 if (request.isUnite() == false){
-                    Double netAss = (traitementInit.getPrice() * item.getNetAssurance())/100;
+                    Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
                     traitement.setNetPayAssu(netAss);
                     traitement.setBaseRembours(item.getBaseRembour());
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
@@ -460,7 +560,7 @@ public class FactureController
                 }
             }else if (traitementInit.getTypePatient().getId() == 3) {
                 traitement.setNetPayAssu(0.0);
-                traitement.setBaseRembours(item.getBaseRembour());
+                traitement.setBaseRembours(0.0);
                 traitement.setNetPayBeneficiaire(traitementInit.getPrice());
             }
 
@@ -469,7 +569,7 @@ public class FactureController
         }
         List<FicheTraitements> traitementSave = this.ficheTraitementsDao.saveAll(ficheTraitements);
         Factures facture = new Factures();
-        facture.setNumero(this.facturesDao.count()+11+"");
+        facture.setNumero((this.facturesDao.count()+1)+"");
         facture.setFiche(ficheSave);
         facture.setUtilisateur(utilisateur);
         facture.setDateFacture(new Date());
@@ -516,7 +616,7 @@ public class FactureController
         //return this.facturesDao.save(request);
     }
 
-    @RequestMapping(value = "/facture/{id}", method =  RequestMethod.PUT, produces = "application/pdf")
+    @RequestMapping(value = "/facture/{id}", method =  RequestMethod.PUT)
     public ResponseEntity<Resource> update(@Valid @RequestBody FactureRequest request,
                                          @CurrentUser final UserDetailsImpl currentUser,
                                            @PathVariable("id") final Long id,
@@ -541,12 +641,12 @@ public class FactureController
             Traitements traitementInit = this.traitementsDao.findById(item.getTraitement().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
             traitement.setFicheTraitementPK(new FicheTraitementPK(ficheSave, traitementInit));
             traitement.setBaseRembours(item.getBaseRembour());
-            if (!item.getKota().trim().equals("") || item.getKota() != null){
+            if (!item.getKota().toLowerCase().trim().equals("") || item.getKota() != null){
                 if (kotasDao.existsByLibelle(item.getKota())){
                     traitement.setKota(this.kotasDao.findByLibelleAndDeletedFalse(item.getKota()));
                 }else {
                     Kotas kota = new Kotas();
-                    kota.setLibelle(item.getKota());
+                    kota.setLibelle(item.getKota().toUpperCase());
                     Kotas kotaSave = this.kotasDao.save(kota);
                     traitement.setKota(kotaSave);
                 }
@@ -574,28 +674,32 @@ public class FactureController
                     traitement.setBaseRembours(item.getBaseRembour());
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
                 }
+            }else if (traitementInit.getTypePatient().getId() == 3) {
+                traitement.setNetPayAssu(0.0);
+                traitement.setBaseRembours(item.getBaseRembour());
+                traitement.setNetPayBeneficiaire(traitementInit.getPrice());
             }
             total += traitement.getNetPayBeneficiaire();
             ficheTraitements.add(traitement);
         }
         List<FicheTraitements> traitementSave = this.ficheTraitementsDao.saveAll(ficheTraitements);
-        Factures facture = new Factures();
-        facture.setNumero(this.facturesDao.count()+11+"");
-        facture.setFiche(ficheSave);
-        facture.setUtilisateur(utilisateur);
-        facture.setDateFacture(new Date());
-        facture.setTotal(total);
+//        Factures facture = new Factures();
+//        facture.setNumero(this.facturesDao.count()+11+"");
+        factureInit.setFiche(ficheSave);
+        factureInit.setUtilisateur(utilisateur);
+        factureInit.setDateFacture(new Date());
+        factureInit.setTotal(total);
         if (request.getAccompte() >= (total - request.getRemise()))
-            facture.setAcompte(0.0);
+            factureInit.setAcompte(0.0);
         else
-            facture.setAcompte(request.getAccompte());
-        facture.setRemise(request.getRemise());
-        facture.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1));
+            factureInit.setAcompte(request.getAccompte());
+        factureInit.setRemise(request.getRemise());
+        factureInit.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1));
         if (request.getAccompte() > 0 && request.getAccompte() < (total - request.getRemise()))
-            facture.setReste(total - (request.getRemise() + request.getAccompte()));
+            factureInit.setReste(total - (request.getRemise() + request.getAccompte()));
         else
-            facture.setReste(0.0);
-        Factures factureSave = this.facturesDao.save(facture);
+            factureInit.setReste(0.0);
+        Factures factureSave = this.facturesDao.save(factureInit);
         File bis = null;
         if (factureSave.getFiche().getPatient().getTypePatient().getId() == 1){
             bis = GenarateFacture.inamPdf(factureSave, traitementSave);

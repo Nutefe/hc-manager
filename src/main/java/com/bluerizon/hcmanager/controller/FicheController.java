@@ -5,12 +5,10 @@
 package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.AssurancesDao;
+import com.bluerizon.hcmanager.dao.FicheTraitementsDao;
 import com.bluerizon.hcmanager.dao.FichesDao;
 import com.bluerizon.hcmanager.dao.PatientsDao;
-import com.bluerizon.hcmanager.models.Assurances;
-import com.bluerizon.hcmanager.models.Fiches;
-import com.bluerizon.hcmanager.models.Patients;
-import com.bluerizon.hcmanager.models.Profils;
+import com.bluerizon.hcmanager.models.*;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.FichePage;
 import com.bluerizon.hcmanager.payload.response.FicheResponse;
@@ -45,11 +43,19 @@ public class FicheController
     private FichesDao fichesDao;
     @Autowired
     private PatientsDao patientsDao;
+    @Autowired
+    private FicheTraitementsDao ficheTraitementsDao;
 
     @GetMapping("/fiche/{id}")
     public Fiches getOne(@PathVariable("id") final Long id) {
         final Fiches fiche = this.fichesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         return fiche;
+    }
+
+    @GetMapping("/fiche/traitement/{id}")
+    public List<FicheTraitements> getFicheTraitement(@PathVariable("id") final Long id) {
+        final Fiches fiche = this.fichesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        return ficheTraitementsDao.findByFiche(fiche);
     }
 
     @RequestMapping(value ="/fiches/page/{id}/{page}", method = RequestMethod.GET)

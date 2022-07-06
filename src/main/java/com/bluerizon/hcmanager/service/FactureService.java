@@ -95,4 +95,24 @@ public class FactureService implements FacturesDao {
     public Long countRechercheSolde(String search) {
         return repository.countRechercheSolde(search);
     }
+
+    @Override
+    public List<Factures> findByDeletedFalseAndSoldeFalse(Pageable pageable) {
+        return repository.findByDeletedFalseAndSoldeFalse(pageable);
+    }
+
+    @Override
+    public List<Factures> rechercheSoldeFalse(String search, Pageable pageable) {
+        return repository.rechercheSoldeFalse(search, pageable);
+    }
+
+    @Override
+    public Long countFacturesSoldeFalse() {
+        return repository.countFacturesSoldeFalse();
+    }
+
+    @Override
+    public Long countRechercheSoldeFalse(String search) {
+        return repository.countRechercheSoldeFalse(search);
+    }
 }

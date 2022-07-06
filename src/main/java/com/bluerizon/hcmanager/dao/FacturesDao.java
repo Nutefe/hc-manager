@@ -40,4 +40,9 @@ public interface FacturesDao {
 
     Long countRechercheSolde(String search);
 
+    List<Factures> findByDeletedFalseAndSoldeFalse(Pageable pageable);
+    List<Factures> rechercheSoldeFalse(String search, Pageable pageable);
+    Long countFacturesSoldeFalse();
+    Long countRechercheSoldeFalse(String search);
+
 }

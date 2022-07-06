@@ -22,8 +22,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false)")
     List<Factures> recherche(String search, Pageable pageable);
 
@@ -38,8 +37,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false)")
     Long countRecherche(String search);
 
@@ -53,8 +51,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false and f.encaisse = true)")
     List<Factures> rechercheEncaisse(String search, Pageable pageable);
 
@@ -69,8 +66,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false and f.encaisse = true)")
     Long countRechercheEncaisse(String search);
 
@@ -84,8 +80,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false and f.solde = true)")
     List<Factures> rechercheSolde(String search, Pageable pageable);
 
@@ -100,9 +95,37 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
             " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " f.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (f.deleted = false and f.solde = true)")
     Long countRechercheSolde(String search);
+
+    List<Factures> findByDeletedFalseAndSoldeFalse(Pageable pageable);
+
+    @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.telephone LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
+            " AND (f.deleted = false and f.solde = false)")
+    List<Factures> rechercheSoldeFalse(String search, Pageable pageable);
+
+    @Query("SELECT COUNT(f) FROM Factures f WHERE f.deleted = false AND f.solde = false")
+    Long countFacturesSoldeFalse();
+
+    @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.telephone LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
+            " f.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
+            " f.fiche.patient.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
+            " AND (f.deleted = false and f.solde = false)")
+    Long countRechercheSoldeFalse(String search);
 
 }
