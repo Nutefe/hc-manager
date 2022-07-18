@@ -149,6 +149,21 @@ public class FileSystemStorageService implements StorageService
             throw new StorageFileNotFoundException("Could not read file: " + filename, e);
         }
     }
+    public boolean existFile( String filename) {
+        try {
+            Path file = load(filename);
+            Resource resource = new UrlResource(file.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return true;
+            }
+            else {
+                return  false;
+            }
+        }
+        catch (MalformedURLException e) {
+            return false;
+        }
+    }
     
     public String rename( String filename) {
         String ext = filename.substring(filename.lastIndexOf(".")+1);

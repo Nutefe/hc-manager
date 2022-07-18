@@ -9,6 +9,7 @@ import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Patients;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.PatientPage;
+import com.bluerizon.hcmanager.payload.request.CodeRequest;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
 import com.bluerizon.hcmanager.security.services.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,16 +247,21 @@ public class PatientController
         this.patientsDao.save(patientInit);
     }
 
-    @RequestMapping(value = { "/check/code/{s}" }, method = { RequestMethod.GET })
+    @RequestMapping(value = { "/check/code" }, method = { RequestMethod.POST })
     @ResponseStatus(HttpStatus.OK)
-    public Boolean checkCode(@PathVariable("s") final String s) {
-        return this.patientsDao.existsByCodeDossier(s);
+    public Boolean checkCode(@Valid @RequestBody CodeRequest request) {
+        return this.patientsDao.existsByCodeDossier(request.getCode());
     }
 
-    @RequestMapping(value = { "/check/code/update/{id}/{s}" }, method = { RequestMethod.GET })
+    @RequestMapping(value = { "/check/code/update/{id}" }, method = { RequestMethod.POST })
     @ResponseStatus(HttpStatus.OK)
-    public Boolean checkCodeId(@PathVariable("s") final String s, @PathVariable("id") final Long id) {
-        return this.patientsDao.existsByCodeDossier(s, id);
+    public Boolean checkCodeId(@Valid @RequestBody CodeRequest request, @PathVariable("id") final Long id) {
+        return this.patientsDao.existsByCodeDossier(request.getCode(), id);
+    }
+    @RequestMapping(value = { "/patient/count" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Long count() {
+        return this.patientsDao.countPatients();
     }
     
     private Sort sortByCreatedDesc() {

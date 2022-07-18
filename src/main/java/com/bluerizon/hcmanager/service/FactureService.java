@@ -1,12 +1,15 @@
 package com.bluerizon.hcmanager.service;
 
 import com.bluerizon.hcmanager.dao.FacturesDao;
+import com.bluerizon.hcmanager.models.Assurances;
+import com.bluerizon.hcmanager.models.Entreprises;
 import com.bluerizon.hcmanager.models.Factures;
 import com.bluerizon.hcmanager.repository.FacturesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -114,5 +117,60 @@ public class FactureService implements FacturesDao {
     @Override
     public Long countRechercheSoldeFalse(String search) {
         return repository.countRechercheSoldeFalse(search);
+    }
+
+    @Override
+    public List<Factures> etatFacture(Assurances assurance, Date start, Date end) {
+        return repository.etatFacture(assurance, start, end);
+    }
+
+    @Override
+    public List<Entreprises> etatEntreprise(Assurances assurance, Date start, Date end) {
+        return repository.etatEntreprise(assurance, start, end);
+    }
+
+    @Override
+    public List<Factures> etatEntreprise(Entreprises entreprise, Assurances assurance, Date start, Date end) {
+        return repository.etatEntreprise(entreprise, assurance, start, end);
+    }
+
+    @Override
+    public Long countDate(Date start) {
+        return repository.countDate(start);
+    }
+
+    @Override
+    public List<Factures> findByDateFactureAndDeletedFalse(Date dateFacture, Pageable pageable) {
+        return repository.findByDateFactureAndDeletedFalse(dateFacture, pageable);
+    }
+
+    @Override
+    public List<Factures> recherche(Date dateFacture, String search, Pageable pageable) {
+        return repository.recherche(dateFacture, search, pageable);
+    }
+
+    @Override
+    public Long countFactures(Date dateFacture) {
+        return repository.countFactures(dateFacture);
+    }
+
+    @Override
+    public Long countRecherche(Date dateFacture, String search) {
+        return repository.countRecherche(dateFacture, search);
+    }
+
+    @Override
+    public Boolean existsByFileName(String fileName) {
+        return repository.existsByFileName(fileName);
+    }
+
+    @Override
+    public boolean existsByFileName(String fileName, Long id) {
+        return repository.existsByFileName(fileName, id);
+    }
+
+    @Override
+    public Factures findByFileName(String fileName) {
+        return repository.findByFileName(fileName);
     }
 }

@@ -27,8 +27,7 @@ public interface PatientsRepository extends JpaRepository<Patients, Long> {
             " p.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " p.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " p.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " p.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " p.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " p.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (p.deleted = false)")
     List<Patients> recherche(String search, Pageable pageable);
 
@@ -42,8 +41,7 @@ public interface PatientsRepository extends JpaRepository<Patients, Long> {
             " p.utilisateur.username LIKE CONCAT('%',:search,'%') OR " +
             " p.utilisateur.nom LIKE CONCAT('%',:search,'%') OR " +
             " p.utilisateur.prenom LIKE CONCAT('%',:search,'%') OR " +
-            " p.typePatient.libelle LIKE CONCAT('%',:search,'%') OR " +
-            " p.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
+            " p.typePatient.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (p.deleted = false)")
     Long countRecherche(String search);
 

@@ -12,10 +12,21 @@ import java.util.List;
 public class FicheResponse {
     private Utilisateurs utilisateur;
     private Patients patient;
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateFiche;
+    private Long id;
     private List<FTraitementResponse> traitements;
 
     public FicheResponse() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Utilisateurs getUtilisateur() {

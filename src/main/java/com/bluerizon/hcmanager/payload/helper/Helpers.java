@@ -11,6 +11,7 @@ import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -83,5 +84,12 @@ public class Helpers
         SimpleDateFormat datej = new SimpleDateFormat("yyyy");
         String datejour = datej.format(date);
         return datejour;
+    }
+
+    public static String convertFr(Date date1){
+//        DateFormat date = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, new Locale("FR","fr"));/
+        SimpleDateFormat datej = new SimpleDateFormat("MMMM yyyy");
+//        datej.format(date1);
+        return datej.format(date1);
     }
 }

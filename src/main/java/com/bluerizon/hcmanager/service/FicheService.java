@@ -55,8 +55,9 @@ public class FicheService implements FichesDao {
             List<FTraitementResponse> list = new ArrayList<>();
             for (FicheTraitements tr:
                     traitements) {
-                list.add(new FTraitementResponse(tr.getKota(), tr.isUnite(), tr.getNetPayAssu(), tr.getBaseRembours(), tr.getNetPayBeneficiaire()));
+                list.add(new FTraitementResponse(tr.getKota(), tr.isUnite(), tr.getNetPayAssu(), tr.getBaseRembours(), tr.getNetPayBeneficiaire(), tr.getFicheTraitementPK().getTraitement()));
             }
+            ficheResponse.setId(item.getId());
             ficheResponse.setUtilisateur(item.getUtilisateur());
             ficheResponse.setPatient(item.getPatient());
             ficheResponse.setDateFiche(item.getDateFiche());
@@ -77,8 +78,9 @@ public class FicheService implements FichesDao {
             List<FTraitementResponse> list = new ArrayList<>();
             for (FicheTraitements tr:
                     traitements) {
-                list.add(new FTraitementResponse(tr.getKota(), tr.isUnite(), tr.getNetPayAssu(), tr.getBaseRembours(), tr.getNetPayBeneficiaire()));
+                list.add(new FTraitementResponse(tr.getKota(), tr.isUnite(), tr.getNetPayAssu(), tr.getBaseRembours(), tr.getNetPayBeneficiaire(), tr.getFicheTraitementPK().getTraitement()));
             }
+            ficheResponse.setId(item.getId());
             ficheResponse.setUtilisateur(item.getUtilisateur());
             ficheResponse.setPatient(item.getPatient());
             ficheResponse.setDateFiche(item.getDateFiche());

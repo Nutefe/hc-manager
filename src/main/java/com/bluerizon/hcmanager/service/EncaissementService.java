@@ -87,4 +87,24 @@ public class EncaissementService implements EncaissementsDao {
     public Double montantDate(Date startDate) {
         return repository.montantDate(startDate);
     }
+
+    @Override
+    public Long countFacture(Date start) {
+        return repository.countFacture(start);
+    }
+
+    @Override
+    public List<Factures> selectFactureEncaisse(Date start, Pageable pageable) {
+        return repository.selectFactureEncaisse(start, pageable);
+    }
+
+    @Override
+    public List<Factures> rechercheFacture(Date dateEncaissement, String search, Pageable pageable) {
+        return repository.rechercheFacture(dateEncaissement, search, pageable);
+    }
+
+    @Override
+    public Long countRechercheFacture(Date dateEncaissement, String search) {
+        return repository.countRechercheFacture(dateEncaissement, search);
+    }
 }

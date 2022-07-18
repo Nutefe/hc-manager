@@ -23,11 +23,11 @@ import java.util.Objects;
  * @author licorne
  */
 @Entity
-@Table(name = "factures")
+@Table(name = "etats")
 @XmlRootElement
 @JsonIgnoreProperties(value = {"updatedAt", "created"})
 @EntityListeners(AuditingEntityListener.class)
-public class Factures implements Serializable {
+public class Etats implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
@@ -40,29 +40,25 @@ public class Factures implements Serializable {
     @ManyToOne
     private Utilisateurs utilisateur;
     @Basic(optional = false)
-    @JoinColumn(name = "fiche", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "assurance", referencedColumnName = "id", nullable = false)
     @ManyToOne
-    private Fiches fiche;
-    @Column(name = "solde", columnDefinition="tinyint(1) default 0")
-    private boolean solde;
-    @Column(name = "encaisse", columnDefinition="tinyint(1) default 0")
-    private boolean encaisse;
-    @Column(name = "numero", unique = true)
-    private String numero;
-    @Column(name = "fileName", unique = true)
+    private Assurances assurance;
+    @Column(name = "fileName")
     private String fileName;
-    @Column(name = "total", columnDefinition="int default 0.0")
-    private Double total;
-    @Column(name = "acompte", columnDefinition="int default 0.0")
-    private Double acompte;
-    @Column(name = "remise", columnDefinition="int default 0.0")
-    private Double remise;
-    @Column(name = "reste", columnDefinition="int default 0.0")
-    private Double reste;
-    @Column(name = "dateFacture", nullable = false)
+    @Column(name = "type")
+    private String type;
+    @Column(name = "dateEtat", nullable = false)
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date dateFacture;
+    private Date dateEtat;
+    @Column(name = "dateDebut", nullable = false)
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateDebut;
+    @Column(name = "dateFin", nullable = false)
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateFin;
     @Version
     @Basic(optional = false)
     @Column(nullable = false)
@@ -78,10 +74,10 @@ public class Factures implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedAt;
 
-    public Factures() {
+    public Etats() {
     }
 
-    public Factures(Long id) {
+    public Etats(Long id) {
         this.id = id;
     }
 
@@ -101,36 +97,12 @@ public class Factures implements Serializable {
         this.utilisateur = utilisateur;
     }
 
-    public Fiches getFiche() {
-        return fiche;
+    public Assurances getAssurance() {
+        return assurance;
     }
 
-    public void setFiche(Fiches fiche) {
-        this.fiche = fiche;
-    }
-
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public boolean isSolde() {
-        return solde;
-    }
-
-    public void setSolde(boolean solde) {
-        this.solde = solde;
-    }
-
-    public boolean isEncaisse() {
-        return encaisse;
-    }
-
-    public void setEncaisse(boolean encaisse) {
-        this.encaisse = encaisse;
+    public void setAssurance(Assurances assurance) {
+        this.assurance = assurance;
     }
 
     public String getFileName() {
@@ -141,44 +113,36 @@ public class Factures implements Serializable {
         this.fileName = fileName;
     }
 
-    public Double getTotal() {
-        return total;
+    public String getType() {
+        return type;
     }
 
-    public void setTotal(Double total) {
-        this.total = total;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public Double getAcompte() {
-        return acompte;
+    public Date getDateEtat() {
+        return dateEtat;
     }
 
-    public void setAcompte(Double acompte) {
-        this.acompte = acompte;
+    public void setDateEtat(Date dateEtat) {
+        this.dateEtat = dateEtat;
     }
 
-    public Double getRemise() {
-        return remise;
+    public Date getDateDebut() {
+        return dateDebut;
     }
 
-    public void setRemise(Double remise) {
-        this.remise = remise;
+    public void setDateDebut(Date dateDebut) {
+        this.dateDebut = dateDebut;
     }
 
-    public Double getReste() {
-        return reste;
+    public Date getDateFin() {
+        return dateFin;
     }
 
-    public void setReste(Double reste) {
-        this.reste = reste;
-    }
-
-    public Date getDateFacture() {
-        return dateFacture;
-    }
-
-    public void setDateFacture(Date dateFacture) {
-        this.dateFacture = dateFacture;
+    public void setDateFin(Date dateFin) {
+        this.dateFin = dateFin;
     }
 
     public int getVersion() {
@@ -217,38 +181,32 @@ public class Factures implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Factures factures = (Factures) o;
-        return solde == factures.solde && encaisse == factures.encaisse && version == factures.version &&
-                deleted == factures.deleted && Objects.equals(id, factures.id) &&
-                Objects.equals(utilisateur, factures.utilisateur) && Objects.equals(fiche, factures.fiche) &&
-                Objects.equals(numero, factures.numero) && Objects.equals(fileName, factures.fileName) &&
-                Objects.equals(total, factures.total) && Objects.equals(acompte, factures.acompte) &&
-                Objects.equals(remise, factures.remise) && Objects.equals(reste, factures.reste) &&
-                Objects.equals(dateFacture, factures.dateFacture) && Objects.equals(createdAt, factures.createdAt) &&
-                Objects.equals(updatedAt, factures.updatedAt);
+        Etats etats = (Etats) o;
+        return version == etats.version && deleted == etats.deleted && Objects.equals(id, etats.id) &&
+                Objects.equals(utilisateur, etats.utilisateur) && Objects.equals(assurance, etats.assurance) &&
+                Objects.equals(fileName, etats.fileName) && Objects.equals(type, etats.type) &&
+                Objects.equals(dateEtat, etats.dateEtat) && Objects.equals(dateDebut, etats.dateDebut) &&
+                Objects.equals(dateFin, etats.dateFin) && Objects.equals(createdAt, etats.createdAt) &&
+                Objects.equals(updatedAt, etats.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, utilisateur, fiche, solde, encaisse, numero, fileName, total, acompte, remise, reste,
-                dateFacture, version, deleted, createdAt, updatedAt);
+        return Objects.hash(id, utilisateur, assurance, fileName, type, dateEtat, dateDebut, dateFin, version,
+                deleted, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
-        return "Factures{" +
+        return "Etats{" +
                 "id=" + id +
                 ", utilisateur=" + utilisateur +
-                ", fiche=" + fiche +
-                ", solde=" + solde +
-                ", encaisse=" + encaisse +
-                ", numero='" + numero + '\'' +
+                ", assurance=" + assurance +
                 ", fileName='" + fileName + '\'' +
-                ", total=" + total +
-                ", acompte=" + acompte +
-                ", remise=" + remise +
-                ", reste=" + reste +
-                ", dateFacture=" + dateFacture +
+                ", type='" + type + '\'' +
+                ", dateEtat=" + dateEtat +
+                ", dateDebut=" + dateDebut +
+                ", dateFin=" + dateFin +
                 ", version=" + version +
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +

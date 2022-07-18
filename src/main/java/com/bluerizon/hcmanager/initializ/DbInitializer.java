@@ -8,20 +8,17 @@ import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Profils;
 import com.bluerizon.hcmanager.models.TypePatients;
 import com.bluerizon.hcmanager.models.Utilisateurs;
-import com.bluerizon.hcmanager.repository.AssurancesRepository;
-import com.bluerizon.hcmanager.repository.ProfilsRepository;
-import com.bluerizon.hcmanager.repository.TypePatientsRepository;
-import com.bluerizon.hcmanager.repository.UtilisateursRepository;
+import com.bluerizon.hcmanager.payload.helper.EnglishNumber;
+import com.bluerizon.hcmanager.payload.helper.FrenchNumber;
+import com.bluerizon.hcmanager.payload.helper.Helpers;
+import com.bluerizon.hcmanager.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @ConditionalOnProperty(name = { "app.db-init" }, havingValue = "true")
@@ -31,6 +28,7 @@ public class DbInitializer implements CommandLineRunner
     private ProfilsRepository profilsRepository;
     private TypePatientsRepository typePatientsRepository;
     private AssurancesRepository assurancesRepository;
+    private FacturesRepository facturesRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -38,11 +36,12 @@ public class DbInitializer implements CommandLineRunner
     public DbInitializer(UtilisateursRepository utilisateursRepository,
                          ProfilsRepository profilsRepository,
                          TypePatientsRepository typePatientsRepository,
-                         AssurancesRepository assurancesRepository) {
+                         AssurancesRepository assurancesRepository, FacturesRepository facturesRepository) {
         this.utilisateursRepository = utilisateursRepository;
         this.profilsRepository = profilsRepository;
         this.typePatientsRepository = typePatientsRepository;
         this.assurancesRepository = assurancesRepository;
+        this.facturesRepository = facturesRepository;
     }
     
     public void run(final String... args) throws Exception {
@@ -131,6 +130,9 @@ public class DbInitializer implements CommandLineRunner
             this.assurancesRepository.saveAll(assurancesList);
         }
 
+//        System.out.println(FrenchNumber.convert(Math.round(99.4999999999999999)));
+//        System.out.println(FrenchNumber.convert(10000000));
+//        System.out.println(EnglishNumber.convert(2147483647));
         System.out.println(" -- Database has been initialized");
     }
 }

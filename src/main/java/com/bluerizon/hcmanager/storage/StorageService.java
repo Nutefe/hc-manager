@@ -31,6 +31,8 @@ public interface StorageService
     boolean deleteOne(final String file_name);
     
     boolean exist(final String file_name);
+
+    boolean existFile( String filename);
     
     String rename(final String file_name);
     

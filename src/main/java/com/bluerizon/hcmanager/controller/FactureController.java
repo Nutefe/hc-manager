@@ -503,6 +503,107 @@ public class FactureController
         return pages;
     }
 
+    @RequestMapping(value ="/factures/day/page/{page}", method = RequestMethod.GET)
+    @ResponseBody
+    public FacturePage selectAllDayPage(@PathVariable(value = "page") int page) {
+
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
+
+        List<Factures> factures = this.facturesDao.findByDateFactureAndDeletedFalse(Helpers.getDateFromString(Helpers.currentDate()), pageable);
+
+        FacturePage pages = new FacturePage();
+
+        Long total = this.facturesDao.countFacturesEncaisse();
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+            if (total % page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_facture_enc_page+1);
+            pages.setLast_page_url(url_facture_enc_page+lastPage);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_facture_enc_page+(page+1));
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_facture_enc_page+(page-1));
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+            pages.setPath(path);
+            pages.setData(factures);
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
+
+    @RequestMapping(value = "/factures/day/search/page/{page}/{s}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public FacturePage searchDayPage(@PathVariable(value = "page") int page,
+                                                   @PathVariable(value = "s") String s){
+
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
+        List<Factures> factures = this.facturesDao.recherche(Helpers.getDateFromString(Helpers.currentDate()), s, pageable);
+
+        FacturePage pages = new FacturePage();
+        Long total = this.facturesDao.countRechercheEncaisse( s);
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+
+            if (total %page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_facture_enc_search_page+1+"/"+s);
+            pages.setLast_page_url(url_facture_enc_search_page+lastPage+"/"+s);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_facture_enc_search_page+(page+1)+"/"+s);
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_facture_enc_search_page+(page-1)+"/"+s);
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+
+            pages.setPath(path);
+            pages.setData(factures);
+
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
+
 
     @RequestMapping(value = "/facture", method =  RequestMethod.POST)
     public ResponseEntity<Resource> save(@Valid @RequestBody FactureRequest request,
@@ -579,7 +680,7 @@ public class FactureController
         else
             facture.setAcompte(request.getAccompte());
         facture.setRemise(request.getRemise());
-        facture.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1));
+        facture.setFileName(Helpers.generatRef("Facture", this.facturesDao.count()+1)+".pdf");
         if (request.getAccompte() > 0 && request.getAccompte() < (total - request.getRemise()))
             facture.setReste(total - (request.getRemise() + request.getAccompte()));
         else
@@ -731,6 +832,14 @@ public class FactureController
         //return this.facturesDao.save(request);
     }
 
+    @RequestMapping(value = "/facture/count/day", method =  RequestMethod.GET)
+    public Long countDay() {
+        return this.facturesDao.countDate(Helpers.getDateFromString(Helpers.currentDate()));
+    }
+    @RequestMapping(value = "/facture/count", method =  RequestMethod.GET)
+    public Long count() {
+        return this.facturesDao.countFactures();
+    }
     @RequestMapping(value = "/facture/{id}", method =  RequestMethod.DELETE)
     public void delete(@PathVariable("id") final Long id) {
         Factures factureInit = this.facturesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));

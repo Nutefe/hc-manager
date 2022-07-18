@@ -3,6 +3,7 @@ package com.bluerizon.hcmanager.service;
 import com.bluerizon.hcmanager.dao.FicheTraitementsDao;
 import com.bluerizon.hcmanager.models.FicheTraitements;
 import com.bluerizon.hcmanager.models.Fiches;
+import com.bluerizon.hcmanager.models.TypeTraitements;
 import com.bluerizon.hcmanager.repository.FicheTraitementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class FicheTraitementService implements FicheTraitementsDao {
     @Override
     public List<FicheTraitements> findByFiche(Fiches fiche) {
         return repository.findByFiche(fiche);
+    }
+
+    @Override
+    public List<TypeTraitements> findByFicheTraitement(Fiches fiche) {
+        return repository.findByFicheTraitement(fiche);
     }
 
     @Override

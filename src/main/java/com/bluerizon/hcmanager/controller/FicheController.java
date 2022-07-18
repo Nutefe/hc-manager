@@ -30,7 +30,7 @@ public class FicheController
     @Value("${app.base}")
     private String path;
 
-    @Value("${app.page_size}")
+    @Value("${app.page_size_traitement}")
     private Integer page_size;
 
     @Value("${app.url_fiche_page}")

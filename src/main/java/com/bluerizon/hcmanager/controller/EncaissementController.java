@@ -17,6 +17,7 @@ import com.bluerizon.hcmanager.payload.genarate.GenarateFacture;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.EncaissementPage;
 import com.bluerizon.hcmanager.payload.pages.EntreprisePage;
+import com.bluerizon.hcmanager.payload.pages.FacturePage;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
 import com.bluerizon.hcmanager.security.services.UserDetailsImpl;
 import com.bluerizon.hcmanager.storage.StorageService;
@@ -290,9 +291,108 @@ public class EncaissementController
 
         return pages;
     }
+    @RequestMapping(value ="/encaissements/facture/day/page/{page}", method = RequestMethod.GET)
+    @ResponseBody
+    public FacturePage selectAllFactureDayPage(@PathVariable(value = "page") int page) {
 
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
 
-    @RequestMapping(value = "/encaissement", method =  RequestMethod.POST, produces = "application/pdf")
+        List<Factures> factures = this.encaissementsDao.selectFactureEncaisse(Helpers.getDateFromString(Helpers.currentDate()), pageable);
+
+        FacturePage pages = new FacturePage();
+
+        Long total = this.encaissementsDao.countEncaissements(Helpers.getDateFromString(Helpers.currentDate()));
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+            if (total % page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_encaissement_day_page+1);
+            pages.setLast_page_url(url_encaissement_day_page+lastPage);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_encaissement_day_page+(page+1));
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_encaissement_day_page+(page-1));
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+            pages.setPath(path);
+            pages.setData(factures);
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
+
+    @RequestMapping(value = "/encaissement/facture/day/search/page/{page}/{s}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public FacturePage searchFactureEncDayPage(@PathVariable(value = "page") int page,
+                                                   @PathVariable(value = "s") String s){
+
+        Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
+        List<Factures> factures = this.encaissementsDao.rechercheFacture(Helpers.getDateFromString(Helpers.currentDate()), s, pageable);
+
+        FacturePage pages = new FacturePage();
+        Long total = this.encaissementsDao.countRechercheFacture(Helpers.getDateFromString(Helpers.currentDate()), s);
+        Long lastPage;
+
+        if (total > 0){
+            pages.setTotal(total);
+            pages.setPer_page(page_size);
+            pages.setCurrent_page(page);
+
+            if (total %page_size == 0){
+                lastPage = total/page_size;
+            } else {
+                lastPage = (total/page_size)+1;
+            }
+            pages.setLast_page(lastPage);
+            pages.setFirst_page_url(url_encaissement_day_search_page+1+"/"+s);
+            pages.setLast_page_url(url_encaissement_day_search_page+lastPage+"/"+s);
+            if (page >= lastPage){
+
+            }else {
+                pages.setNext_page_url(url_encaissement_day_search_page+(page+1)+"/"+s);
+            }
+
+            if (page == 1){
+                pages.setPrev_page_url(null);
+                pages.setFrom(1L);
+                pages.setTo(Long.valueOf(page_size));
+            } else {
+                pages.setPrev_page_url(url_encaissement_day_search_page+(page-1)+"/"+s);
+                pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
+                pages.setTo(Long.valueOf(page_size) * page);
+            }
+
+            pages.setPath(path);
+            pages.setData(factures);
+
+        }else {
+            pages.setTotal(0L);
+        }
+
+        return pages;
+    }
+
+    @RequestMapping(value = "/encaissement", method =  RequestMethod.POST)
     public ResponseEntity<Resource> save(@Valid @RequestBody Encaissements request,
                                          @CurrentUser final UserDetailsImpl currentUser,
                                          final HttpServletRequest requestServlet) throws IOException {
@@ -302,6 +402,7 @@ public class EncaissementController
 
         Encaissements paye = null;
         if (!facture.isSolde()){
+
             if (facture.isEncaisse()){
                 List<Encaissements> encaissements = this.encaissementsDao.findByFactureAndDeletedFalse(facture);
                 Double initEnc = 0.0;
@@ -314,9 +415,9 @@ public class EncaissementController
                     request.setUtilisateur(utilisateur);
                     request.setDateEncaissement(new Date());
                     request.setReliquat(request.getTotal() - request.getMontant());
-                    request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1));
+                    request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1)+".pdf");
                     request.setReste((facture.getTotal() - facture.getRemise()) - (initEnc + request.getMontant()));
-                    System.out.println("En 1"+request);
+
                     paye = this.encaissementsDao.save(request);
                     facture.setEncaisse(true);
                     facture.setReste(facture.getTotal() - (initEnc + paye.getMontant() + facture.getRemise()));
@@ -329,19 +430,19 @@ public class EncaissementController
 
                 }
             } else {
-                if (facture.getAcompte() > 0.0){
+                if (facture.getAcompte() > 0){
                     if (facture.getAcompte().compareTo(request.getMontant()) == 0){
-                        System.out.println("Ennnnn");
                         request.setFacture(facture);
                         request.setUtilisateur(utilisateur);
                         request.setDateEncaissement(new Date());
                         request.setReliquat(request.getTotal() - request.getMontant());
-                        request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1));
+                        request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1)+".pdf");
                         request.setReste((facture.getTotal() - facture.getRemise()) - request.getMontant());
-                        System.out.println("En 2"+request);
+
                         paye = this.encaissementsDao.save(request);
                         facture.setEncaisse(true);
                         facture.setReste(facture.getTotal() - (paye.getMontant() +  facture.getRemise()));
+                        facture.setAcompte(0.0);
                         Factures factureUp = this.facturesDao.save(facture);
                         if ((factureUp.getTotal() - factureUp.getRemise()) == paye.getMontant()){
                             factureUp.setSolde(true);
@@ -352,13 +453,13 @@ public class EncaissementController
                     }
                 } else {
                     if ((facture.getTotal() - facture.getRemise()) >= request.getMontant()){
+
                         request.setFacture(facture);
                         request.setUtilisateur(utilisateur);
                         request.setDateEncaissement(new Date());
                         request.setReliquat(request.getTotal() - request.getMontant());
-                        request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1));
+                        request.setFileName(Helpers.generatRef("Encaissement", this.encaissementsDao.count()+1)+".pdf");
                         request.setReste((facture.getTotal() - facture.getRemise()) - request.getMontant());
-                        System.out.println("En 3"+request);
                         paye = this.encaissementsDao.save(request);
                         facture.setEncaisse(true);
                         facture.setReste(facture.getTotal() - (paye.getMontant() +  facture.getRemise()));
@@ -398,6 +499,18 @@ public class EncaissementController
                 .body(resource);
     }
 
+    @RequestMapping(value = "/encaissement/count/day", method =  RequestMethod.GET)
+    public Long countDay() {
+        return this.encaissementsDao.countEncaissements(Helpers.getDateFromString(Helpers.currentDate()));
+    }
+    @RequestMapping(value = "/encaissement/montant/day", method =  RequestMethod.GET)
+    public Double montantDay() {
+        return this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate()));
+    }
+    @RequestMapping(value = "/encaissement/facture/day", method =  RequestMethod.GET)
+    public Long countFactureDay() {
+        return this.encaissementsDao.countFacture(Helpers.getDateFromString(Helpers.currentDate()));
+    }
     @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.DELETE)
     public void delete(@PathVariable("id") final Long id) {
         Encaissements encaissementInit = this.encaissementsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));

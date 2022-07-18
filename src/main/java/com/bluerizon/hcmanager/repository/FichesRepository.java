@@ -19,7 +19,7 @@ public interface FichesRepository extends JpaRepository<Fiches, Long> {
     @Query("SELECT COUNT(f) FROM Fiches f WHERE f.deleted = false AND f.patient = :patient")
     Long countFiches(final Patients patient);
 
-    @Query("SELECT f FROM Fiches f WHERE (f.dateFiche LIKE CONCAT('%',:search,'%'))" +
+    @Query("SELECT COUNT(f) FROM Fiches f WHERE (f.dateFiche LIKE CONCAT('%',:search,'%'))" +
             " AND (f.patient = :patient AND f.deleted = false)")
     Long countRecherche(final Patients patient, final String search);
 }

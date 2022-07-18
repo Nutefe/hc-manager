@@ -194,6 +194,12 @@ public class TraitementController
         traitementInit.setDeleted(true);
         this.traitementsDao.save(traitementInit);
     }
+
+    @RequestMapping(value = { "/traitement/count" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Long count() {
+        return this.traitementsDao.countTraitements();
+    }
     
     private Sort sortByCreatedDesc() {
         return Sort.by(Sort.Direction.DESC, new String[] { "createdAt" });

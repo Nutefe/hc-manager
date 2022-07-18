@@ -6,19 +6,12 @@ import com.bluerizon.hcmanager.models.Factures;
 import com.bluerizon.hcmanager.models.FicheTraitements;
 import com.bluerizon.hcmanager.payload.helper.FrenchNumber;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
-import com.itextpdf.io.font.PdfEncodings;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.DeviceGray;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
-import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.Style;
 import com.itextpdf.layout.borders.Border;
@@ -28,23 +21,16 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
-import javax.swing.text.StyleConstants;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class GenarateFacture {
+public class GenarateEtatEntreprise {
 
     public static File inamPdf(Factures factures, List<FicheTraitements> request) throws IOException {
 
         File file = new File(Helpers.path_file+factures.getFileName());
-//        File file = new File(Helpers.path_file+factures.getFileName()+".pdf");
 //        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // ouvrir un document pour ecrire
@@ -164,7 +150,7 @@ public class GenarateFacture {
                 paragraph4.setMarginTop(30);
                 paragraph4.setVerticalAlignment(VerticalAlignment.BOTTOM);
 
-                paragraph5.add("Arreté la présente facture à la somme de: "+ FrenchNumber.convert(Math.round(arrete))+"("+arrete+") Fcfa")
+                paragraph5.add("Arreté la présente facture à la somme de: "+arrete+" Fcfa")
                         .setFontSize(12);
                 paragraph5.setMarginLeft(45);
                 paragraph5.setMarginRight(45);
@@ -206,8 +192,7 @@ public class GenarateFacture {
     }
     public static File autrePdf(Factures factures, List<FicheTraitements> request) throws IOException {
 
-        File file = new File(Helpers.path_file+factures.getFileName());
-//        File file = new File(Helpers.path_file+factures.getFileName()+".pdf");
+        File file = new File(Helpers.path_file+factures.getFileName()+".pdf");
 //        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // ouvrir un document pour ecrire
@@ -327,7 +312,7 @@ public class GenarateFacture {
                 paragraph4.setMarginTop(30);
                 paragraph4.setVerticalAlignment(VerticalAlignment.BOTTOM);
 
-                paragraph5.add("Arreté la présente facture à la somme de: "+ FrenchNumber.convert(Math.round(arrete))+"("+arrete+") Fcfa")
+                paragraph5.add("Arreté la présente facture à la somme de: "+arrete+" Fcfa")
                         .setFontSize(12);
                 paragraph5.setMarginLeft(45);
                 paragraph5.setMarginRight(45);
@@ -335,7 +320,7 @@ public class GenarateFacture {
                 paragraph5.setVerticalAlignment(VerticalAlignment.BOTTOM);
             } else {
 
-                paragraph5.add("Arreté la présente facture à la somme de: "+ FrenchNumber.convert(Math.round(totalAssureur))+"("+totalAssureur+") Fcfa")
+                paragraph5.add("Arreté la présente facture à la somme de: "+totalAssureur+" Fcfa")
                         .setFontSize(12);
                 paragraph5.setMarginLeft(45);
                 paragraph5.setMarginRight(45);
@@ -369,8 +354,7 @@ public class GenarateFacture {
     }
     public static File nonPdf(Factures factures, List<FicheTraitements> request) throws IOException {
 
-        File file = new File(Helpers.path_file+factures.getFileName());
-//        File file = new File(Helpers.path_file+factures.getFileName()+".pdf");
+        File file = new File(Helpers.path_file+factures.getFileName()+".pdf");
 //        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // ouvrir un document pour ecrire
@@ -488,7 +472,7 @@ public class GenarateFacture {
             paragraph4.setMarginTop(30);
             paragraph4.setVerticalAlignment(VerticalAlignment.BOTTOM);
 
-            paragraph5.add("Arreté la présente facture à la somme de: "+ FrenchNumber.convert(Math.round(arrete))+"("+arrete+") Fcfa")
+            paragraph5.add("Arreté la présente facture à la somme de: "+arrete+" Fcfa")
                     .setFontSize(12);
             paragraph5.setMarginLeft(45);
             paragraph5.setMarginRight(45);
@@ -521,7 +505,7 @@ public class GenarateFacture {
     }
     public static File caisse(Encaissements encaissement) throws IOException {
 
-        File file = new File(Helpers.path_file+encaissement.getFileName());
+        File file = new File(Helpers.path_file+encaissement.getFileName()+".pdf");
 //        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         // ouvrir un document pour ecrire

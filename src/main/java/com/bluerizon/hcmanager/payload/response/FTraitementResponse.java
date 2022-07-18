@@ -1,6 +1,7 @@
 package com.bluerizon.hcmanager.payload.response;
 
 import com.bluerizon.hcmanager.models.Kotas;
+import com.bluerizon.hcmanager.models.Traitements;
 
 import javax.persistence.Column;
 
@@ -10,6 +11,7 @@ public class FTraitementResponse {
     private Double netPayAssu;
     private Double baseRembours;
     private Double netPayBeneficiaire;
+    private Traitements traitement;
     public FTraitementResponse() {
     }
 
@@ -19,6 +21,15 @@ public class FTraitementResponse {
         this.netPayAssu = netPayAssu;
         this.baseRembours = baseRembours;
         this.netPayBeneficiaire = netPayBeneficiaire;
+    }
+
+    public FTraitementResponse(Kotas kota, boolean unite, Double netPayAssu, Double baseRembours, Double netPayBeneficiaire, Traitements traitement) {
+        this.kota = kota;
+        this.unite = unite;
+        this.netPayAssu = netPayAssu;
+        this.baseRembours = baseRembours;
+        this.netPayBeneficiaire = netPayBeneficiaire;
+        this.traitement = traitement;
     }
 
     public Kotas getKota() {
@@ -59,5 +70,13 @@ public class FTraitementResponse {
 
     public void setNetPayBeneficiaire(Double netPayBeneficiaire) {
         this.netPayBeneficiaire = netPayBeneficiaire;
+    }
+
+    public Traitements getTraitement() {
+        return traitement;
+    }
+
+    public void setTraitement(Traitements traitement) {
+        this.traitement = traitement;
     }
 }
