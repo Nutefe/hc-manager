@@ -655,9 +655,12 @@ public class FactureController
                     traitement.setBaseRembours(item.getBaseRembour());
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
                 } else {
-                    traitement.setNetPayAssu(item.getBaseRembour());
+                    traitement.setNetPayAssu(item.getNetAssurance());
                     traitement.setBaseRembours(item.getBaseRembour());
-                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
+//                    traitement.setNetPayAssu(item.getBaseRembour());
+//                    traitement.setBaseRembours(item.getBaseRembour());
+//                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
                 }
             }else if (traitementInit.getTypePatient().getId() == 3) {
                 traitement.setNetPayAssu(0.0);
