@@ -20,6 +20,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     List<Factures> findByDeletedFalse(Pageable pageable);
 
     @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -35,6 +36,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     Long countFactures();
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -49,6 +51,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     List<Factures> findByDeletedFalseAndEncaisseTrue(Pageable pageable);
 
     @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -64,6 +67,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     Long countFacturesEncaisse();
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -78,6 +82,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     List<Factures> findByDeletedFalseAndSoldeTrue(Pageable pageable);
 
     @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -93,6 +98,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     Long countFacturesSolde();
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -107,6 +113,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     List<Factures> findByDeletedFalseAndSoldeFalse(Pageable pageable);
 
     @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -122,6 +129,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     Long countFacturesSoldeFalse();
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -144,6 +152,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     List<Factures> findByDateFactureAndDeletedFalse(Date dateFacture, Pageable pageable);
 
     @Query("SELECT f FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +
@@ -159,6 +168,7 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
     Long countFactures(Date dateFacture);
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
+            " f.numero LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.codeDossier LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.nom LIKE CONCAT('%',:search,'%') OR " +
             " f.fiche.patient.prenom LIKE CONCAT('%',:search,'%') OR " +

@@ -28,7 +28,7 @@ import com.itextpdf.layout.properties.HorizontalAlignment;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.VerticalAlignment;
 
-import javax.swing.text.StyleConstants;
+//import javax.swing.text.StyleConstants;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -601,13 +601,22 @@ public class GenarateFacture {
 //                .setTextAlignment(TextAlignment.LEFT).add(new Paragraph("Date Paiement: "+ Helpers.convertDate(new Date())).setFontSize(9)));
 //        document.add(tableDate);
         Table tablePrice = new Table(2).setWidth(180);
-        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(new Paragraph("Total facture: ").setFontSize(9)));
+        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(
+                new Paragraph("Total facture: ").setFontSize(9)));
         tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.RIGHT).add(
                 new Paragraph(""+(encaissement.getFacture().getTotal() - encaissement.getFacture().getRemise())).setFontSize(9)));
         tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(
                 new Paragraph("Net Payer:").setFontSize(9)));
         tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.RIGHT).add(
                 new Paragraph(""+encaissement.getMontant()).setFontSize(9)));
+        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(
+                new Paragraph("Reliquat:").setFontSize(9)));
+        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.RIGHT).add(
+                new Paragraph(""+encaissement.getReliquat()).setFontSize(9)));
+        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(
+                new Paragraph("Acompte:").setFontSize(9)));
+        tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.RIGHT).add(
+                new Paragraph(""+encaissement.getFacture().getAcompte()).setFontSize(9)));
         tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.LEFT).add(
                 new Paragraph("Reste a payer:").setFontSize(9)));
         tablePrice.addCell(new Cell().addStyle(new Style().setBorder(Border.NO_BORDER)).setTextAlignment(TextAlignment.RIGHT).add(
