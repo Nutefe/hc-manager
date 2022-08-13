@@ -64,6 +64,11 @@ public class FactureController
 
     @Value("${app.url_facture_enc_search_page}")
     private String url_facture_enc_search_page;
+    @Value("${app.url_facture_day_page}")
+    private String url_facture_day_page;
+
+    @Value("${app.url_facture_day_search_page}")
+    private String url_facture_day_search_page;
 
     @Autowired
     private FacturesDao facturesDao;
@@ -513,7 +518,7 @@ public class FactureController
 
         FacturePage pages = new FacturePage();
 
-        Long total = this.facturesDao.countFacturesEncaisse();
+        Long total = this.facturesDao.countFactures(Helpers.getDateFromString(Helpers.currentDate()));
         Long lastPage;
 
         if (total > 0){
@@ -527,12 +532,12 @@ public class FactureController
 
             }
             pages.setLast_page(lastPage);
-            pages.setFirst_page_url(url_facture_enc_page+1);
-            pages.setLast_page_url(url_facture_enc_page+lastPage);
+            pages.setFirst_page_url(url_facture_day_page+1);
+            pages.setLast_page_url(url_facture_day_page+lastPage);
             if (page >= lastPage){
 
             }else {
-                pages.setNext_page_url(url_facture_enc_page+(page+1));
+                pages.setNext_page_url(url_facture_day_page+(page+1));
             }
 
             if (page == 1){
@@ -540,7 +545,7 @@ public class FactureController
                 pages.setFrom(1L);
                 pages.setTo(Long.valueOf(page_size));
             } else {
-                pages.setPrev_page_url(url_facture_enc_page+(page-1));
+                pages.setPrev_page_url(url_facture_day_page+(page-1));
                 pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
                 pages.setTo(Long.valueOf(page_size) * page);
             }
@@ -562,7 +567,7 @@ public class FactureController
         List<Factures> factures = this.facturesDao.recherche(Helpers.getDateFromString(Helpers.currentDate()), s, pageable);
 
         FacturePage pages = new FacturePage();
-        Long total = this.facturesDao.countRechercheEncaisse( s);
+        Long total = this.facturesDao.countRecherche(Helpers.getDateFromString(Helpers.currentDate()), s);
         Long lastPage;
 
         if (total > 0){
@@ -576,12 +581,12 @@ public class FactureController
                 lastPage = (total/page_size)+1;
             }
             pages.setLast_page(lastPage);
-            pages.setFirst_page_url(url_facture_enc_search_page+1+"/"+s);
-            pages.setLast_page_url(url_facture_enc_search_page+lastPage+"/"+s);
+            pages.setFirst_page_url(url_facture_day_search_page+1+"/"+s);
+            pages.setLast_page_url(url_facture_day_search_page+lastPage+"/"+s);
             if (page >= lastPage){
 
             }else {
-                pages.setNext_page_url(url_facture_enc_search_page+(page+1)+"/"+s);
+                pages.setNext_page_url(url_facture_day_search_page+(page+1)+"/"+s);
             }
 
             if (page == 1){
@@ -589,7 +594,7 @@ public class FactureController
                 pages.setFrom(1L);
                 pages.setTo(Long.valueOf(page_size));
             } else {
-                pages.setPrev_page_url(url_facture_enc_search_page+(page-1)+"/"+s);
+                pages.setPrev_page_url(url_facture_day_search_page+(page-1)+"/"+s);
                 pages.setFrom(1L + (Long.valueOf(page_size)*(page -1)));
                 pages.setTo(Long.valueOf(page_size) * page);
             }
