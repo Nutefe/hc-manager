@@ -19,11 +19,13 @@ public interface UtilisateursRepository extends JpaRepository<Utilisateurs, Long
 
     List<Utilisateurs> findByDeletedFalseOrderByIdDesc();
 
-
-    @Query("SELECT u FROM Utilisateurs u WHERE u.deleted = false AND u.id != :id")
+    @Query("SELECT DISTINCT u FROM Utilisateurs u JOIN u.profils r WHERE r.id = 4 AND u.deleted = false AND u.id!=1")
+    List<Utilisateurs> selectUserCaisse();
+    @Query("SELECT DISTINCT u FROM Utilisateurs u JOIN u.profils r WHERE u.id > 1 AND u.deleted = false AND u.id != :id")
     List<Utilisateurs> selectUser(Long id);
 
-    @Query("SELECT u FROM Utilisateurs u WHERE u.deleted = false AND u.id != :id")
+//    @Query("SELECT u FROM Utilisateurs u WHERE u.deleted = false AND u.id != :id")
+    @Query("SELECT DISTINCT u FROM Utilisateurs u JOIN u.profils r WHERE u.id > 1 AND u.deleted = false AND u.id != :id")
     List<Utilisateurs> selectAllUsers(Long id, Pageable pageable);
 
     List<Utilisateurs> findByDeletedTrueOrderByIdDesc();
@@ -43,17 +45,19 @@ public interface UtilisateursRepository extends JpaRepository<Utilisateurs, Long
     @Query("update Utilisateurs u set u.password = :password where u.id = :id")
     void updatePassword(@Param("id") final Long id, @Param("password") final String password);
 
-    @Query("SELECT u FROM Utilisateurs u WHERE (u.username LIKE CONCAT('%',:search,'%') OR " +
+//    @Query("SELECT DISTINCT u FROM Utilisateurs u JOIN u.profils r WHERE r.id != 1 AND u.deleted = false AND u.id != :id")
+
+    @Query("SELECT DISTINCT u FROM Utilisateurs u JOIN u.profils r WHERE (u.username LIKE CONCAT('%',:search,'%') OR " +
             "u.nom LIKE CONCAT('%',:search,'%') OR " +
-            "u.prenom LIKE CONCAT('%',:search,'%')) AND (u.id != :id And u.deleted = false)")
+            "u.prenom LIKE CONCAT('%',:search,'%')) AND (u.id > 1 AND u.id != :id And u.deleted = false)")
     List<Utilisateurs> recherche(String search, Long id, Pageable pageable);
 
-    @Query("SELECT COUNT(u) FROM Utilisateurs u WHERE u.deleted = false AND u.id != :id")
+    @Query("SELECT DISTINCT COUNT(u) FROM Utilisateurs u JOIN u.profils r WHERE u.id > 1 AND u.deleted = false AND u.id != :id")
     Long countUser(Long id);
 
-    @Query("SELECT COUNT(u) FROM Utilisateurs u WHERE (u.username LIKE CONCAT('%',:search,'%') OR " +
+    @Query("SELECT DISTINCT COUNT(u) FROM Utilisateurs u JOIN u.profils r WHERE (u.username LIKE CONCAT('%',:search,'%') OR " +
             "u.nom LIKE CONCAT('%',:search,'%') OR " +
-            "u.prenom LIKE CONCAT('%',:search,'%')) AND (u.id != :id And u.deleted = false)")
+            "u.prenom LIKE CONCAT('%',:search,'%')) AND (u.id > 1 AND u.id != :id And u.deleted = false)")
     Long countRecherche(String search, Long id);
 
 }

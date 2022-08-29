@@ -159,7 +159,11 @@ public class FactureController
     @ResponseStatus(HttpStatus.OK)
     public FacturePage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Factures> factures = this.facturesDao.recherche(s, pageable);
 
@@ -260,7 +264,11 @@ public class FactureController
     @ResponseStatus(HttpStatus.OK)
     public FacturePage searchSoldePage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Factures> factures = this.facturesDao.rechercheSolde( s, pageable);
 
@@ -360,7 +368,11 @@ public class FactureController
     @ResponseStatus(HttpStatus.OK)
     public FacturePage searchNotSoldePage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Factures> factures = this.facturesDao.rechercheSoldeFalse( s, pageable);
 
@@ -461,7 +473,11 @@ public class FactureController
     @ResponseStatus(HttpStatus.OK)
     public FacturePage searchEncDayPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Factures> factures = this.facturesDao.rechercheEncaisse( s, pageable);
 
@@ -562,7 +578,11 @@ public class FactureController
     @ResponseStatus(HttpStatus.OK)
     public FacturePage searchDayPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Factures> factures = this.facturesDao.recherche(Helpers.getDateFromString(Helpers.currentDate()), s, pageable);
 
@@ -609,7 +629,6 @@ public class FactureController
         return pages;
     }
 
-
     @RequestMapping(value = "/facture", method =  RequestMethod.POST)
     public ResponseEntity<Resource> save(@Valid @RequestBody FactureRequest request,
                                          @CurrentUser final UserDetailsImpl currentUser,
@@ -641,9 +660,9 @@ public class FactureController
                     traitement.setKota(kotaSave);
                 }
             }
-            traitement.setUnite(request.isUnite());
+            traitement.setUnite(item.isUnite());
             if (traitementInit.getTypePatient().getId() == 1){
-                if (request.isUnite() == false){
+                if (item.isUnite() == false){
                     Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
                     traitement.setNetPayAssu(netAss);
                     traitement.setBaseRembours(item.getBaseRembour());
@@ -654,7 +673,7 @@ public class FactureController
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
                 }
             } else if (traitementInit.getTypePatient().getId() == 2) {
-                if (request.isUnite() == false){
+                if (item.isUnite() == false){
                     Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
                     traitement.setNetPayAssu(netAss);
                     traitement.setBaseRembours(item.getBaseRembour());
@@ -678,7 +697,7 @@ public class FactureController
         }
         List<FicheTraitements> traitementSave = this.ficheTraitementsDao.saveAll(ficheTraitements);
         Factures facture = new Factures();
-        facture.setNumero((this.facturesDao.count()+1)+"");
+        facture.setNumero((this.facturesDao.count()+1)+"/E2V/"+Helpers.year());
         facture.setFiche(ficheSave);
         facture.setUtilisateur(utilisateur);
         facture.setDateFacture(new Date());
@@ -760,9 +779,9 @@ public class FactureController
                     traitement.setKota(kotaSave);
                 }
             }
-            traitement.setUnite(request.isUnite());
+            traitement.setUnite(item.isUnite());
             if (traitementInit.getTypePatient().getId() == 1){
-                if (request.isUnite() == false){
+                if (item.isUnite() == false){
                     Double netAss = (traitementInit.getPrice() * item.getNetAssurance())/100;
                     traitement.setNetPayAssu(netAss);
                     traitement.setBaseRembours(item.getBaseRembour());
@@ -773,7 +792,7 @@ public class FactureController
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
                 }
             } else if (traitementInit.getTypePatient().getId() == 2) {
-                if (request.isUnite() == false){
+                if (item.isUnite() == false){
                     Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
                     traitement.setNetPayAssu(netAss);
                     traitement.setBaseRembours(item.getBaseRembour());

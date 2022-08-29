@@ -41,6 +41,8 @@ public interface EncaissementsDao {
 
     Long countFacture(final Date start);
 
+    Long countPatient(final Date start);
+
     List<Factures> selectFactureEncaisse(Date start, Pageable pageable);
     List<Factures> rechercheFacture(final Date dateEncaissement, String search, Pageable pageable);
     Long countRechercheFacture(final Date dateEncaissement, String search);

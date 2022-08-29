@@ -106,7 +106,11 @@ public class ProfilController
     @ResponseStatus(HttpStatus.OK)
     public ProfilPage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Profils> profils = this.profilsDao.recherche(s, pageable);
 

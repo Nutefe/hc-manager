@@ -75,7 +75,8 @@ public class GenarateFacture {
 
             // paragraphe numero facture
             Paragraph paragraph1 = new Paragraph();
-            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+            paragraph1.add("FACTURE N°: " +factures.getNumero()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+//            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
             paragraph1.setMarginLeft(45);
             paragraph1.setMarginRight(45);
             paragraph1.setMarginTop(20);
@@ -83,7 +84,7 @@ public class GenarateFacture {
             // paragraphe designation de la facture
             Paragraph paragraph2 = new Paragraph();
             paragraph2.add("Doit: ASSURANCE ................................... Pour le paiement des frais de ...............").setFontSize(12).setTextAlignment(TextAlignment.JUSTIFIED_ALL);
-            paragraph2.add("........................................................................ De M./Mme/Enft : " +
+            paragraph2.add("............................................................ De M./Mme/Enft : " +
                     factures.getFiche().getPatient().getNom() +
                     " " + factures.getFiche().getPatient().getPrenom()).setFontSize(12).setTextAlignment(TextAlignment.JUSTIFIED);
             paragraph2.setMarginLeft(45);
@@ -238,7 +239,8 @@ public class GenarateFacture {
 
             // paragraphe numero facture
             Paragraph paragraph1 = new Paragraph();
-            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+            paragraph1.add("FACTURE N°: " +factures.getNumero()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+//            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
             paragraph1.setMarginLeft(45);
             paragraph1.setMarginRight(45);
             paragraph1.setMarginTop(20);
@@ -246,7 +248,7 @@ public class GenarateFacture {
             // paragraphe designation de la facture
             Paragraph paragraph2 = new Paragraph();
             paragraph2.add("Doit: ASSURANCE ................................... Pour le paiement des frais de ...............").setFontSize(12).setTextAlignment(TextAlignment.JUSTIFIED_ALL);
-            paragraph2.add("........................................................................ De M./Mme/Enft : " +
+            paragraph2.add("............................................................ De M./Mme/Enft : " +
                     factures.getFiche().getPatient().getNom() +
                     " " + factures.getFiche().getPatient().getPrenom()).setFontSize(12).setTextAlignment(TextAlignment.JUSTIFIED);
             paragraph2.setMarginLeft(45);
@@ -401,7 +403,8 @@ public class GenarateFacture {
 
             // paragraphe numero facture
             Paragraph paragraph1 = new Paragraph();
-            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+            paragraph1.add("FACTURE N°: " +factures.getNumero()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
+//            paragraph1.add("FACTURE N°: " +factures.getNumero()+"/E2V/"+ Helpers.year()+"                                             Lomé, le "+Helpers.convertDate(factures.getCreatedAt())).setFontSize(12).setTextAlignment(TextAlignment.LEFT);
             paragraph1.setMarginLeft(45);
             paragraph1.setMarginRight(45);
             paragraph1.setMarginTop(20);
@@ -529,7 +532,7 @@ public class GenarateFacture {
 
         PdfDocument pdfDocument = new PdfDocument(pdfWriter);
 
-        PageSize pageSize = new PageSize(204 ,567);
+        PageSize pageSize = new PageSize(204 ,580);
 
         pdfDocument.setDefaultPageSize(pageSize);
 
@@ -629,6 +632,7 @@ public class GenarateFacture {
         document.add(pDate);
         document.add(paragraph2);
         document.add(tablePrice);
+        document.setBottomMargin(10);
 //        document.add(pMontantFacture);
 //        document.add(pNetPaye);
 //        document.add(pReste);

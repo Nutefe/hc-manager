@@ -7,6 +7,7 @@ package com.bluerizon.hcmanager.controller;
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.models.Assurances;
 import com.bluerizon.hcmanager.models.Patients;
+import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.PatientPage;
 import com.bluerizon.hcmanager.payload.request.CodeRequest;
@@ -127,7 +128,11 @@ public class PatientController
     @ResponseStatus(HttpStatus.OK)
     public PatientPage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Patients> patients = this.patientsDao.recherche(s, pageable);
 
@@ -262,6 +267,12 @@ public class PatientController
     @ResponseStatus(HttpStatus.OK)
     public Long count() {
         return this.patientsDao.countPatients();
+    }
+
+    @RequestMapping(value = "/patient/count/day", method =  RequestMethod.GET)
+    public Long countPatientDay() {
+//        System.out.println(Helpers.currentDate());
+        return this.patientsDao.countDate(Helpers.currentDateSimple());
     }
     
     private Sort sortByCreatedDesc() {

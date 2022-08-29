@@ -106,7 +106,11 @@ public class TypePatientController
     @ResponseStatus(HttpStatus.OK)
     public TypePatientPage searchProfilPage(@PathVariable(value = "page") int page,
                                             @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<TypePatients> patients = this.patientsDao.recherche(s, pageable);
 

@@ -12,6 +12,8 @@ public class TraitementRequest {
 	private Double baseRembour;
 	private Double netAssurance;
 
+	private boolean unite;
+
 	public TraitementRequest() {
 	}
 
@@ -45,5 +47,13 @@ public class TraitementRequest {
 
 	public void setNetAssurance(Double netAssurance) {
 		this.netAssurance = netAssurance;
+	}
+
+	public boolean isUnite() {
+		return unite;
+	}
+
+	public void setUnite(boolean unite) {
+		this.unite = unite;
 	}
 }

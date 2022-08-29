@@ -28,6 +28,14 @@ public class Helpers
         final String heurejour = heure.format(date);
         return datejour+" "+heurejour;
     }
+    public static String currentDateSimple() {
+        final Date date = new Date();
+        final SimpleDateFormat datej = new SimpleDateFormat("yyyy-MM-dd");
+        final String datejour = datej.format(date);
+        final SimpleDateFormat heure = new SimpleDateFormat("HH:mm:ss");
+        final String heurejour = heure.format(date);
+        return datejour;
+    }
 
     public static Date getDateFromString(String s) {
         final Date datej;

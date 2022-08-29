@@ -70,4 +70,9 @@ public class PatientService implements PatientsDao {
     public List<Patients> selectPatientAssurer() {
         return repository.selectPatientAssurer();
     }
+
+    @Override
+    public Long countDate(String date) {
+        return repository.countDate(date);
+    }
 }

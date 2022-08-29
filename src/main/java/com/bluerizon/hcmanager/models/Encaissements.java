@@ -40,6 +40,10 @@ public class Encaissements implements Serializable {
     @JoinColumn(name = "utilisateur", referencedColumnName = "id", nullable = false)
     @ManyToOne
     private Utilisateurs utilisateur;
+    @JoinColumns({ @JoinColumn(name = "caisse", referencedColumnName = "caisse"),
+            @JoinColumn(name = "user", referencedColumnName = "utilisateur") })
+    @ManyToOne
+    private LigneCaisses ligneCaisse;
     @Basic(optional = false)
     @JoinColumn(name = "facture", referencedColumnName = "id", nullable = false)
     @ManyToOne
@@ -94,6 +98,14 @@ public class Encaissements implements Serializable {
 
     public void setUtilisateur(Utilisateurs utilisateur) {
         this.utilisateur = utilisateur;
+    }
+
+    public LigneCaisses getLigneCaisse() {
+        return ligneCaisse;
+    }
+
+    public void setLigneCaisse(LigneCaisses ligneCaisse) {
+        this.ligneCaisse = ligneCaisse;
     }
 
     public Factures getFacture() {
@@ -190,17 +202,18 @@ public class Encaissements implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Encaissements that = (Encaissements) o;
         return version == that.version && deleted == that.deleted && Objects.equals(id, that.id) &&
-                Objects.equals(utilisateur, that.utilisateur) && Objects.equals(facture, that.facture) &&
-                Objects.equals(total, that.total) && Objects.equals(montant, that.montant) &&
-                Objects.equals(reliquat, that.reliquat) && Objects.equals(reste, that.reste) &&
-                Objects.equals(dateEncaissement, that.dateEncaissement) && Objects.equals(fileName, that.fileName) &&
-                Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+                Objects.equals(utilisateur, that.utilisateur) && Objects.equals(ligneCaisse, that.ligneCaisse) &&
+                Objects.equals(facture, that.facture) && Objects.equals(total, that.total) &&
+                Objects.equals(montant, that.montant) && Objects.equals(reliquat, that.reliquat) &&
+                Objects.equals(reste, that.reste) && Objects.equals(dateEncaissement, that.dateEncaissement) &&
+                Objects.equals(fileName, that.fileName) && Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, utilisateur, facture, total, montant, reliquat, reste, dateEncaissement, fileName,
-                version, deleted, createdAt, updatedAt);
+        return Objects.hash(id, utilisateur, ligneCaisse, facture, total, montant, reliquat, reste, dateEncaissement,
+                fileName, version, deleted, createdAt, updatedAt);
     }
 
     @Override
@@ -208,6 +221,7 @@ public class Encaissements implements Serializable {
         return "Encaissements{" +
                 "id=" + id +
                 ", utilisateur=" + utilisateur +
+                ", ligneCaisse=" + ligneCaisse +
                 ", facture=" + facture +
                 ", total=" + total +
                 ", montant=" + montant +

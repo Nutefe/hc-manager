@@ -116,7 +116,11 @@ public class EntrepriseController
     @ResponseStatus(HttpStatus.OK)
     public EntreprisePage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Entreprises> entreprises = this.entreprisesDao.recherche(s, pageable);
 

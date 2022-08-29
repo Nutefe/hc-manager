@@ -138,7 +138,11 @@ public class EtatController
     @ResponseStatus(HttpStatus.OK)
     public EtatPage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Etats> etats = this.etatsDao.recherche(s, pageable);
 
@@ -263,9 +267,10 @@ public class EtatController
 
         List<EtatFactureEntreprise> factureEntreprises = new ArrayList<>();
 
-        List<EtatFacturePatient> facturePatients = new ArrayList<>();
+
         for (Entreprises item :
                 entreprises) {
+            List<EtatFacturePatient> facturePatients = new ArrayList<>();
             EtatFactureEntreprise factureEntreprise= new EtatFactureEntreprise();
 
             List<Factures> factures = this.facturesDao.etatEntreprise(
@@ -273,7 +278,7 @@ public class EtatController
                     assurance,
                     getDateFromString(request.getStart()),
                     getDateFromString(request.getEnd()));
-
+//            System.out.println(factures.size());
             for (Factures facture :
                     factures) {
                 EtatFacturePatient etatFacture = new EtatFacturePatient();
@@ -284,6 +289,7 @@ public class EtatController
                 facturePatients.add(etatFacture);
 
             }
+//            System.out.println(facturePatients.size());
             factureEntreprise.setEntreprise(item);
             factureEntreprise.setFacturePatients(facturePatients);
             factureEntreprises.add(factureEntreprise);

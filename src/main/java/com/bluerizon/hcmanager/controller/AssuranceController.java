@@ -114,7 +114,11 @@ public class AssuranceController
     @ResponseStatus(HttpStatus.OK)
     public AssurancePage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Assurances> assurances = this.assurancesDao.recherche(s, pageable);
 

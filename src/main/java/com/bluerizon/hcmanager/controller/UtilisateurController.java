@@ -77,6 +77,12 @@ public class UtilisateurController
 
         return utilisateurs;
     }
+    @RequestMapping(value = "/utilisateurs/caisse", method = RequestMethod.GET )
+    public List<Utilisateurs> getAllCaisse() {
+        List<Utilisateurs> utilisateurs=utilisateursDao.selectUserCaisse();
+
+        return utilisateurs;
+    }
 
     @RequestMapping(value = "/utilisateurs", method = RequestMethod.GET )
     public List<Utilisateurs> getAll(@CurrentUser final UserDetailsImpl currentUser) {
@@ -141,7 +147,11 @@ public class UtilisateurController
     public UtilisateurPage searchUtilisateurPage(@PathVariable(value = "page") int page,
                                                   @PathVariable(value = "s") String s,
                                                   @CurrentUser final UserDetailsImpl currentUser){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Utilisateurs> utilisateurs = this.utilisateursDao.recherche(s, currentUser.getId(), pageable);
 

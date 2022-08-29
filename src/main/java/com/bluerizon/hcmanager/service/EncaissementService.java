@@ -94,6 +94,11 @@ public class EncaissementService implements EncaissementsDao {
     }
 
     @Override
+    public Long countPatient(Date start) {
+        return repository.countPatient(start);
+    }
+
+    @Override
     public List<Factures> selectFactureEncaisse(Date start, Pageable pageable) {
         return repository.selectFactureEncaisse(start, pageable);
     }

@@ -81,6 +81,8 @@ public interface EncaissementsRepository extends JpaRepository<Encaissements, Lo
 
     @Query("SELECT DISTINCT COUNT(e.facture) FROM Encaissements e WHERE e.deleted = false AND e.dateEncaissement =:start  ORDER BY e.id")
     Long countFacture(final Date start);
+    @Query("SELECT DISTINCT COUNT(e.facture.fiche.patient) FROM Encaissements e WHERE e.deleted = false AND e.dateEncaissement =:start  ORDER BY e.id")
+    Long countPatient(final Date start);
 
     @Query("SELECT DISTINCT e.facture FROM Encaissements e WHERE e.deleted = false AND e.dateEncaissement =:start  ORDER BY e.id")
     List<Factures> selectFactureEncaisse(Date start, Pageable pageable);

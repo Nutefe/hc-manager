@@ -112,7 +112,11 @@ public class FicheController
     @ResponseStatus(HttpStatus.OK)
     public FichePage searchFichePage(@PathVariable(value = "id") Long id, @PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         Patients patient = this.patientsDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         List<FicheResponse> fiches = this.fichesDao.rechercheRes(patient, s, pageable);

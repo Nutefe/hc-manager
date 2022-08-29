@@ -50,5 +50,7 @@ public interface PatientsRepository extends JpaRepository<Patients, Long> {
     @Query("SELECT CASE WHEN COUNT(codeDossier) > 0 THEN true ELSE false END FROM Patients p WHERE p.codeDossier = :code and p.id != :id")
     boolean existsByCodeDossier(@Param("code") final String code, @Param("id") final Long id);
 
+    @Query("SELECT COUNT(p) FROM Patients p WHERE p.createdAt LIKE CONCAT('%',:date,'%') AND (p.deleted = false)")
+    Long countDate(String date);
 
 }

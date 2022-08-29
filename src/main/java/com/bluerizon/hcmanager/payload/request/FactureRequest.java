@@ -12,7 +12,7 @@ public class FactureRequest {
 
 	private Patients patient;
 	private List<TraitementRequest> traitements;
-	private boolean unite;
+//	private boolean unite;
 	private Double accompte;
 	private Double remise;
 
@@ -35,13 +35,13 @@ public class FactureRequest {
 		this.traitements = traitements;
 	}
 
-	public boolean isUnite() {
-		return unite;
-	}
-
-	public void setUnite(boolean unite) {
-		this.unite = unite;
-	}
+//	public boolean isUnite() {
+//		return unite;
+//	}
+//
+//	public void setUnite(boolean unite) {
+//		this.unite = unite;
+//	}
 
 	public Double getRemise() {
 		return remise;

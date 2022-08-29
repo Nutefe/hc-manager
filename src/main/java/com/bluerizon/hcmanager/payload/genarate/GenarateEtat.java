@@ -281,7 +281,7 @@ public class GenarateEtat {
                             .setTextAlignment(TextAlignment.CENTER),
                     new Cell()
                             .setBackgroundColor(new DeviceGray(0.75f))
-                            .add(new Paragraph("MONTANT TOTAL A REGLE PAR OLEA").setFontSize(12).setBold())
+                            .add(new Paragraph("MONTANT TOTAL A REGLE PAR "+etat.getAssurance().getLibelle()).setFontSize(12).setBold())
                             .setTextAlignment(TextAlignment.CENTER),
             };
 

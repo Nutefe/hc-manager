@@ -42,5 +42,6 @@ public interface UtilisateursDao {
 
     void update(Utilisateurs utilisateur);
 
+    List<Utilisateurs> selectUserCaisse();
 
 }

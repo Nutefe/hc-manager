@@ -79,6 +79,11 @@ public class UtilisateurService implements UtilisateursDao {
     }
 
     @Override
+    public List<Utilisateurs> selectUserCaisse() {
+        return repository.selectUserCaisse();
+    }
+
+    @Override
     public boolean existsByEmail(String email, Long id) {
         return repository.existsByEmail(email, id);
     }

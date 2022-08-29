@@ -122,7 +122,11 @@ public class TraitementController
     @ResponseStatus(HttpStatus.OK)
     public TraitementPage searchProfilPage(@PathVariable(value = "page") int page,
                                                    @PathVariable(value = "s") String s){
-
+        if (s.contains("-")){
+            s = s.replaceAll("-", "/");
+        } else if (s.contains("&&")) {
+            s = s.replaceAll("&&", "-");
+        }
         Pageable pageable = PageRequest.of(page - 1, page_size, sortByCreatedDesc());
         List<Traitements> traitements = this.traitementsDao.recherche(s, pageable);
 
