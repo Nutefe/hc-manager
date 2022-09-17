@@ -6,16 +6,14 @@ package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.exception.NotFoundRequestException;
-import com.bluerizon.hcmanager.models.Encaissements;
-import com.bluerizon.hcmanager.models.Entreprises;
-import com.bluerizon.hcmanager.models.Factures;
-import com.bluerizon.hcmanager.models.Utilisateurs;
+import com.bluerizon.hcmanager.models.*;
 import com.bluerizon.hcmanager.payload.genarate.GenarateFacture;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.EncaissementPage;
 import com.bluerizon.hcmanager.payload.pages.EntreprisePage;
 import com.bluerizon.hcmanager.payload.pages.FacturePage;
 import com.bluerizon.hcmanager.payload.response.EtatEncaissemnt;
+import com.bluerizon.hcmanager.payload.response.EtatRecette;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
 import com.bluerizon.hcmanager.security.services.UserDetailsImpl;
 import com.bluerizon.hcmanager.storage.StorageService;
@@ -77,6 +75,16 @@ public class EncaissementController
     private UtilisateursDao utilisateursDao;
     @Autowired
     private PatientsDao patientsDao;
+    @Autowired
+    private LigneCaisseDao ligneCaisseDao;
+    @Autowired
+    private CaisseDao caisseDao;
+    @Autowired
+    private DecaissementDao decaissementDao;
+    @Autowired
+    private ReserveDao reserveDao;
+    @Autowired
+    private DepenseReserveDao depenseReserveDao;
     private final Logger logger;
     @Autowired
     private StorageService fileStorageService;
@@ -417,7 +425,7 @@ public class EncaissementController
 
         Factures facture = this.facturesDao.findById(request.getFacture().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-
+        LigneCaisses ligneCaisse = this.ligneCaisseDao.findFirstByUser(utilisateur);
         Encaissements paye = null;
         if (!facture.isSolde()){
 
@@ -429,6 +437,13 @@ public class EncaissementController
                     initEnc +=item.getMontant();
                 }
                 if ((facture.getTotal() - initEnc) >= request.getMontant()){
+
+                    Caisses caisse = ligneCaisse.getCaissePK().getCaisse();
+                    caisse.setSolde(caisse.getSolde() + request.getMontant());
+                    caisse.setRecette(caisse.getRecette() + request.getMontant());
+                    this.caisseDao.save(caisse);
+
+                    request.setLigneCaisse(ligneCaisse);
                     request.setFacture(facture);
                     request.setUtilisateur(utilisateur);
                     request.setDateEncaissement(new Date());
@@ -450,6 +465,13 @@ public class EncaissementController
             } else {
                 if (facture.getAcompte() > 0){
                     if (facture.getAcompte().compareTo(request.getMontant()) == 0){
+
+                        Caisses caisse = ligneCaisse.getCaissePK().getCaisse();
+                        caisse.setSolde(caisse.getSolde() + request.getMontant());
+                        caisse.setRecette(caisse.getRecette() + request.getMontant());
+                        this.caisseDao.save(caisse);
+
+                        request.setLigneCaisse(ligneCaisse);
                         request.setFacture(facture);
                         request.setUtilisateur(utilisateur);
                         request.setDateEncaissement(new Date());
@@ -472,6 +494,12 @@ public class EncaissementController
                 } else {
                     if ((facture.getTotal() - facture.getRemise()) >= request.getMontant()){
 
+                        Caisses caisse = ligneCaisse.getCaissePK().getCaisse();
+                        caisse.setSolde(caisse.getSolde() + request.getMontant());
+                        caisse.setRecette(caisse.getRecette() + request.getMontant());
+                        this.caisseDao.save(caisse);
+
+                        request.setLigneCaisse(ligneCaisse);
                         request.setFacture(facture);
                         request.setUtilisateur(utilisateur);
                         request.setDateEncaissement(new Date());
@@ -553,6 +581,14 @@ public class EncaissementController
     @ResponseStatus(HttpStatus.OK)
     public Double montantDate(@PathVariable("date") final String date) {
         return this.encaissementsDao.montantDate(Helpers.getDateFromString(date));
+    }
+
+    @RequestMapping(value = { "/encaissement/montant" }, method = { RequestMethod.GET })
+    @ResponseStatus(HttpStatus.OK)
+    public Double montantTotal() {
+        Double enc = this.encaissementsDao.montant() -
+                (this.decaissementDao.montantTotalDecaissements() + this.reserveDao.montantTotalReserves());
+        return enc;
     }
 
     @RequestMapping(value = { "/encaissement/etat/date/{date}" }, method = { RequestMethod.GET })
@@ -683,6 +719,20 @@ public class EncaissementController
         etatEncaissemnt.setPage(pages);
 
         return etatEncaissemnt;
+    }
+
+    @RequestMapping(value = "/recette/etat/date/{start}/{end}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public EtatRecette selectEtatDate(@PathVariable(value = "start") String dateStart,
+                                      @PathVariable("end") final String dateEnd){
+
+        EtatRecette etatRecette = new EtatRecette();
+        etatRecette.setMontantRecette(this.encaissementsDao.montantDateEncaissement(Helpers.getDateFromString(dateStart), Helpers.getDateFromString(dateEnd)));
+        etatRecette.setMontantDecaissement(this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(dateStart), Helpers.getDateFromString(dateEnd)));
+        etatRecette.setMontantReserve(this.reserveDao.montantDateReserve(Helpers.getDateFromString(dateStart), Helpers.getDateFromString(dateEnd)));
+        etatRecette.setMontantDepense(this.depenseReserveDao.montantDateDepense(Helpers.getDateFromString(dateStart), Helpers.getDateFromString(dateEnd)));
+
+        return etatRecette;
     }
 
     @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.DELETE)

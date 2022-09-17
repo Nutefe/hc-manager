@@ -29,6 +29,9 @@ public class Reserves implements Serializable
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    @JoinColumn(name = "caisse", referencedColumnName = "id")
+    @ManyToOne
+    private Caisses caisse;
     @Column(name = "libelle", length = 50)
     private String libelle;
     @Column(name = "jours")
@@ -43,6 +46,10 @@ public class Reserves implements Serializable
     @Column(name = "montantSuivant")
     private Double montantSuivant;
 
+    @Column(name = "dateReserve")
+    @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern="yyyy-MM-dd")
+    private Date dateReserve;
     @Column(name = "dateSuivant")
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd")
@@ -73,6 +80,14 @@ public class Reserves implements Serializable
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Caisses getCaisse() {
+        return caisse;
+    }
+
+    public void setCaisse(Caisses caisse) {
+        this.caisse = caisse;
     }
 
     public String getLibelle() {
@@ -113,6 +128,14 @@ public class Reserves implements Serializable
 
     public void setDateSuivant(Date dateSuivant) {
         this.dateSuivant = dateSuivant;
+    }
+
+    public Date getDateReserve() {
+        return dateReserve;
+    }
+
+    public void setDateReserve(Date dateReserve) {
+        this.dateReserve = dateReserve;
     }
 
     public Integer getJours() {
@@ -160,24 +183,33 @@ public class Reserves implements Serializable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Reserves reserves = (Reserves) o;
-        return deleted == reserves.deleted && Objects.equals(id, reserves.id) && Objects.equals(libelle, reserves.libelle) && Objects.equals(jours, reserves.jours) && Objects.equals(heure, reserves.heure) && Objects.equals(montantDefini, reserves.montantDefini) && Objects.equals(montantReserve, reserves.montantReserve) && Objects.equals(montantSuivant, reserves.montantSuivant) && Objects.equals(dateSuivant, reserves.dateSuivant) && Objects.equals(createdAt, reserves.createdAt) && Objects.equals(updatedAt, reserves.updatedAt);
+        return deleted == reserves.deleted && Objects.equals(id, reserves.id) && Objects.equals(caisse, reserves.caisse) &&
+                Objects.equals(libelle, reserves.libelle) && Objects.equals(jours, reserves.jours) &&
+                Objects.equals(heure, reserves.heure) && Objects.equals(montantDefini, reserves.montantDefini) &&
+                Objects.equals(montantReserve, reserves.montantReserve) &&
+                Objects.equals(montantSuivant, reserves.montantSuivant) && Objects.equals(dateReserve, reserves.dateReserve) &&
+                Objects.equals(dateSuivant, reserves.dateSuivant) && Objects.equals(createdAt, reserves.createdAt) &&
+                Objects.equals(updatedAt, reserves.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, libelle, jours, heure, montantDefini, montantReserve, montantSuivant, dateSuivant, deleted, createdAt, updatedAt);
+        return Objects.hash(id, caisse, libelle, jours, heure, montantDefini, montantReserve, montantSuivant,
+                dateReserve, dateSuivant, deleted, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
         return "Reserves{" +
                 "id=" + id +
+                ", caisse=" + caisse +
                 ", libelle='" + libelle + '\'' +
                 ", jours=" + jours +
                 ", heure='" + heure + '\'' +
                 ", montantDefini=" + montantDefini +
                 ", montantReserve=" + montantReserve +
                 ", montantSuivant=" + montantSuivant +
+                ", dateReserve=" + dateReserve +
                 ", dateSuivant=" + dateSuivant +
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +

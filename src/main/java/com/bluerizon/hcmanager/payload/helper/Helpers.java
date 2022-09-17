@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Helpers
 {
@@ -99,5 +100,20 @@ public class Helpers
         SimpleDateFormat datej = new SimpleDateFormat("MMMM yyyy");
 //        datej.format(date1);
         return datej.format(date1);
+    }
+
+    public static Long dayBetween(Date firstDate, Date secondDate){
+        long diffInMillies = Math.abs(secondDate.getTime() - firstDate.getTime());
+        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        return diff;
+    }
+
+    public static Date tomorowDate(){
+        Date td = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(td);
+        c.add(Calendar.DATE, 1);
+
+        return c.getTime();
     }
 }

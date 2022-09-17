@@ -57,4 +57,6 @@ public interface DecaissementDao {
     Double montantDateDecaissements(final Date dateDecaissement);
 
     Double montantTotalDecaissements();
+
+    Double montantDateDecaissements(final Date dateStart, final Date dateEnd);
 }

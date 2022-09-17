@@ -4,10 +4,12 @@
 
 package com.bluerizon.hcmanager.controller;
 
-import com.bluerizon.hcmanager.dao.AssurancesDao;
-import com.bluerizon.hcmanager.dao.ReserveDao;
+import com.bluerizon.hcmanager.dao.*;
+import com.bluerizon.hcmanager.exception.BadRequestException;
 import com.bluerizon.hcmanager.models.Assurances;
+import com.bluerizon.hcmanager.models.Caisses;
 import com.bluerizon.hcmanager.models.Reserves;
+import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.ReservePage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +18,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -39,6 +43,14 @@ public class ReserveController
 
     @Autowired
     private ReserveDao reserveDao;
+    @Autowired
+    private CaisseDao caisseDao;
+    @Autowired
+    private EncaissementsDao encaissementsDao;
+    @Autowired
+    private DecaissementDao decaissementDao;
+    @Autowired
+    private DepenseReserveDao depenseReserveDao;
 
     @GetMapping("/reserve/{id}")
     public Reserves getOne(@PathVariable("id") final Integer id) {
@@ -159,18 +171,152 @@ public class ReserveController
 
     @RequestMapping(value = "/reserve", method =  RequestMethod.POST)
     public Reserves save(@Valid @RequestBody Reserves request) {
+        request.setCaisse(caisseDao.findById(request.getCaisse().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         request.setLibelle(request.getLibelle().toUpperCase());
         request.setMontantSuivant(request.getMontantDefini());
         request.setMontantReserve(0.0);
+        request.setDateReserve(new Date());
+        request.setDateSuivant(Helpers.tomorowDate());
         return this.reserveDao.save(request);
+    }
+    @RequestMapping(value = "/reserve/journaliere", method =  RequestMethod.GET)
+    public ResponseEntity<?> save() {
+        Reserves reserveInit = this.reserveDao.findTop1ByDeletedFalse();
+        Caisses caisse = this.caisseDao.findById(reserveInit.getCaisse().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Reserves reserve = new Reserves();
+        reserve.setCaisse(caisse);
+        reserve.setLibelle(reserveInit.getLibelle().toUpperCase());
+        reserve.setHeure(reserveInit.getHeure());
+        reserve.setJours(reserveInit.getJours());
+        reserve.setDateReserve(new Date());
+        reserve.setDateSuivant(Helpers.tomorowDate());
+        reserve.setMontantDefini(reserveInit.getMontantDefini());
+//        Double enc = this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate()));
+//        Double dec = this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate()));
+
+        Long nd = Helpers.dayBetween(reserveInit.getDateSuivant(), new Date());
+
+        if (nd == 0){
+            if (caisse.getSolde() >= reserveInit.getMontantSuivant()){
+                reserve.setMontantReserve(reserveInit.getMontantSuivant());
+                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + reserveInit.getMontantSuivant());
+                caisse.setSolde(caisse.getSolde() - reserveInit.getMontantSuivant());
+                this.caisseDao.save(caisse);
+            } else {
+                reserve.setMontantReserve(caisse.getSolde());
+                reserve.setMontantSuivant((reserveInit.getMontantSuivant() - caisse.getSolde()) + reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
+                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
+                this.caisseDao.save(caisse);
+            }
+            return ResponseEntity.ok(this.reserveDao.save(reserve));
+        } else if (nd > 0) {
+            if (caisse.getSolde() >= (reserveInit.getMontantSuivant()*nd)){
+                reserve.setMontantReserve(reserveInit.getMontantSuivant()*nd);
+                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + (reserveInit.getMontantSuivant()*nd));
+                caisse.setSolde(caisse.getSolde() - (reserveInit.getMontantSuivant()*nd));
+                this.caisseDao.save(caisse);
+            } else {
+                reserve.setMontantReserve(caisse.getSolde());
+                reserve.setMontantSuivant(((reserveInit.getMontantSuivant()*nd) - caisse.getSolde()) + reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
+                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
+                this.caisseDao.save(caisse);
+            }
+            return ResponseEntity.ok(this.reserveDao.save(reserve));
+        } else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
+        }
+    }
+
+    @RequestMapping(value = "/reserve/jours", method =  RequestMethod.POST)
+    public ResponseEntity<?> saveReserve(@Valid @RequestBody Reserves request) {
+        Reserves reserveInit = this.reserveDao.findFirst1ByDeletedFalseOrderByIdDesc();
+        Reserves reserveSecond = this.reserveDao.findTop1ByDeletedFalse();
+        Caisses caisse = this.caisseDao.findById(reserveInit.getCaisse().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        Reserves reserve = new Reserves();
+        reserve.setCaisse(caisse);
+        reserve.setLibelle(reserveInit.getLibelle().toUpperCase());
+//        reserve.setHeure(reserveInit.getHeure());
+//        reserve.setJours(reserveInit.getJours());
+        reserve.setDateReserve(new Date());
+        reserve.setDateSuivant(Helpers.tomorowDate());
+        reserve.setMontantDefini(request.getMontantDefini());
+//        System.out.println(reserveSecond.getMontantSuivant());
+//        System.out.println(request.getMontantDefini());
+        if (request.getMontantDefini() <= reserveSecond.getMontantSuivant()){
+            if (request.getMontantDefini() == reserveSecond.getMontantSuivant()){
+                System.out.println(reserveSecond.getMontantDefini());
+                reserve.setMontantReserve(request.getMontantDefini());
+                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                this.caisseDao.save(caisse);
+                return ResponseEntity.ok(this.reserveDao.save(reserve));
+            } else{
+                reserve.setMontantReserve(request.getMontantDefini());
+                reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                this.caisseDao.save(caisse);
+                return ResponseEntity.ok(this.reserveDao.save(reserve));
+            }
+        }
+        else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
+        }
+
+//        Double enc = this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate()));
+//        Double dec = this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate()));
+
+//        Long nd = Helpers.dayBetween(reserveInit.getDateSuivant(), new Date());
+
+//        if (nd == 0){
+//            if (caisse.getSolde() >= reserveInit.getMontantSuivant()){
+//                reserve.setMontantReserve(reserveInit.getMontantSuivant());
+//                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+//                caisse.setDecaissement(caisse.getDecaissement() + reserveInit.getMontantSuivant());
+//                caisse.setSolde(caisse.getSolde() - reserveInit.getMontantSuivant());
+//                this.caisseDao.save(caisse);
+//            } else {
+//                reserve.setMontantReserve(caisse.getSolde());
+//                reserve.setMontantSuivant((reserveInit.getMontantSuivant() - caisse.getSolde()) + reserveInit.getMontantDefini());
+//                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
+//                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
+//                this.caisseDao.save(caisse);
+//            }
+//            return ResponseEntity.ok(this.reserveDao.save(reserve));
+//        } else if (nd > 0) {
+//            if (caisse.getSolde() >= (reserveInit.getMontantSuivant()*nd)){
+//                reserve.setMontantReserve(reserveInit.getMontantSuivant()*nd);
+//                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+//                caisse.setDecaissement(caisse.getDecaissement() + (reserveInit.getMontantSuivant()*nd));
+//                caisse.setSolde(caisse.getSolde() - (reserveInit.getMontantSuivant()*nd));
+//                this.caisseDao.save(caisse);
+//            } else {
+//                reserve.setMontantReserve(caisse.getSolde());
+//                reserve.setMontantSuivant(((reserveInit.getMontantSuivant()*nd) - caisse.getSolde()) + reserveInit.getMontantDefini());
+//                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
+//                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
+//                this.caisseDao.save(caisse);
+//            }
+//            return ResponseEntity.ok(this.reserveDao.save(reserve));
+//        } else {
+//            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
+//        }
     }
 
     @RequestMapping(value = "/reserve/{id}", method =  RequestMethod.PUT)
     public Reserves update(@Valid @RequestBody Reserves request, @PathVariable("id") final Integer id) {
         Reserves reserveInit = this.reserveDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        reserveInit.setCaisse(caisseDao.findById(request.getCaisse().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found.")));
         reserveInit.setLibelle(request.getLibelle().toUpperCase());
         reserveInit.setHeure(request.getHeure());
         reserveInit.setJours(reserveInit.getJours());
+        reserveInit.setDateReserve(new Date());
+        reserveInit.setDateSuivant(Helpers.tomorowDate());
         if (reserveInit.getMontantDefini() >= request.getMontantDefini())
             reserveInit.setMontantSuivant(reserveInit.getMontantSuivant() - (reserveInit.getMontantDefini() - request.getMontantDefini()));
         else
@@ -184,6 +330,20 @@ public class ReserveController
         Reserves reserveInit = reserveDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         reserveInit.setDeleted(true);
         this.reserveDao.save(reserveInit);
+    }
+
+    @RequestMapping(value = "/reserve/day", method =  RequestMethod.GET)
+    public Double montantReserveDay() {
+        return this.reserveDao.montantDateReserves(Helpers.getDateFromString(Helpers.currentDate()));
+    }
+    @RequestMapping(value = "/reserve/date/{date}", method =  RequestMethod.GET)
+    public Double montantReserveDate(@PathVariable("date") final String date) {
+        return this.reserveDao.montantDateReserves(Helpers.getDateFromString(date));
+    }
+    @RequestMapping(value = "/reserve/montant", method =  RequestMethod.GET)
+    public Double montantReserve() {
+        Double res = this.reserveDao.montantTotalReserves() - this.depenseReserveDao.montantTotalReserves();
+        return res;
     }
     
     private Sort sortByCreatedDesc() {

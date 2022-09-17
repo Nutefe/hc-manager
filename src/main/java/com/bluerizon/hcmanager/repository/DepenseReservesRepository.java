@@ -27,7 +27,10 @@ public interface DepenseReservesRepository extends JpaRepository<DepenseReserves
     @Query("SELECT COUNT(d.montant) FROM DepenseReserves d WHERE d.dateDepense=:dateDepense AND d.deleted = false")
     Double montantReserves(final Date dateDepense);
 
-    @Query("SELECT COUNT(d.montant) FROM DepenseReserves d WHERE d.deleted = false")
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM DepenseReserves d WHERE d.deleted = false")
     Double montantTotalReserves();
+
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM DepenseReserves d WHERE d.dateDepense BETWEEN :dateStart AND :dateEnd  AND d.deleted = false")
+    Double montantDateDepense(final Date dateStart, final Date dateEnd);
 
 }

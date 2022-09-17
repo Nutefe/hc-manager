@@ -8,19 +8,19 @@ import java.util.List;
 
 public class CaisseRequest {
 
-	private Utilisateurs utilisateur;
+	private List<Utilisateurs> utilisateurs;
 	private String libelle;
 	private Double montant;
 
 	public CaisseRequest() {
 	}
 
-	public Utilisateurs getUtilisateur() {
-		return utilisateur;
+	public List<Utilisateurs> getUtilisateurs() {
+		return utilisateurs;
 	}
 
-	public void setUtilisateur(Utilisateurs utilisateur) {
-		this.utilisateur = utilisateur;
+	public void setUtilisateurs(List<Utilisateurs> utilisateurs) {
+		this.utilisateurs = utilisateurs;
 	}
 
 	public String getLibelle() {

@@ -29,6 +29,11 @@ public class LigneCaisseService implements LigneCaisseDao {
     }
 
     @Override
+    public LigneCaisses findFirstByUserCaisse(Utilisateurs utilisateur) {
+        return repository.findFirstByUserCaisse(utilisateur);
+    }
+
+    @Override
     public LigneCaisses save(LigneCaisses ligneCaisse) {
         return repository.save(ligneCaisse);
     }

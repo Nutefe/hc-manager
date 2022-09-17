@@ -4,10 +4,7 @@
 
 package com.bluerizon.hcmanager.initializ;
 
-import com.bluerizon.hcmanager.models.Assurances;
-import com.bluerizon.hcmanager.models.Profils;
-import com.bluerizon.hcmanager.models.TypePatients;
-import com.bluerizon.hcmanager.models.Utilisateurs;
+import com.bluerizon.hcmanager.models.*;
 import com.bluerizon.hcmanager.payload.helper.EnglishNumber;
 import com.bluerizon.hcmanager.payload.helper.FrenchNumber;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
@@ -29,6 +26,7 @@ public class DbInitializer implements CommandLineRunner
     private TypePatientsRepository typePatientsRepository;
     private AssurancesRepository assurancesRepository;
     private FacturesRepository facturesRepository;
+    private DocumentsRepository documentsRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -36,12 +34,15 @@ public class DbInitializer implements CommandLineRunner
     public DbInitializer(UtilisateursRepository utilisateursRepository,
                          ProfilsRepository profilsRepository,
                          TypePatientsRepository typePatientsRepository,
-                         AssurancesRepository assurancesRepository, FacturesRepository facturesRepository) {
+                         AssurancesRepository assurancesRepository,
+                         FacturesRepository facturesRepository,
+                         DocumentsRepository documentsRepository) {
         this.utilisateursRepository = utilisateursRepository;
         this.profilsRepository = profilsRepository;
         this.typePatientsRepository = typePatientsRepository;
         this.assurancesRepository = assurancesRepository;
         this.facturesRepository = facturesRepository;
+        this.documentsRepository = documentsRepository;
     }
     
     public void run(final String... args) throws Exception {
@@ -128,6 +129,19 @@ public class DbInitializer implements CommandLineRunner
             List<Assurances> assurancesList = new ArrayList<>();
             assurancesList.add(assurance);
             this.assurancesRepository.saveAll(assurancesList);
+        }
+
+        if (this.documentsRepository.count()<=0){
+            List<Documents> documents = new ArrayList<>();
+            documents.add(new Documents("FICHE VIDE", "exemplaire_fiche_e2v.pdf"));
+            documents.add(new Documents("BULLETIN D'ANALYSE EXEMPLE", "exemplaire_bulletin_analyse.pdf"));
+            documents.add(new Documents("FACTURE PROFORMA EXEMPLE 1", "fiche_facture_proforma1_e2v.pdf"));
+            documents.add(new Documents("FACTURE PROFORMA EXEMPLE 2", "fiche_facture_proforma2_e2v.pdf"));
+            documents.add(new Documents("FACTURE PROFORMA EXEMPLE 3", "fiche_facture_proforma3_e2v.pdf"));
+            documents.add(new Documents("FACTURE PROFORMA EXEMPLE 4", "fiche_facture_proforma4_e2v.pdf"));
+            documents.add(new Documents("FICHE ORDONNANCE", "fiche_ordonnace_e2v.pdf"));
+            documents.add(new Documents("FICHE ORDONNANCE LUNETTE", "fiche_ordonnance_lunette_e2v.pdf"));
+            this.documentsRepository.saveAll(documents);
         }
 
 //        System.out.println(FrenchNumber.convert(Math.round(99.4999999999999999)));

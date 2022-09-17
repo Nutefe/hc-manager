@@ -112,4 +112,14 @@ public class EncaissementService implements EncaissementsDao {
     public Long countRechercheFacture(Date dateEncaissement, String search) {
         return repository.countRechercheFacture(dateEncaissement, search);
     }
+
+    @Override
+    public Double montant() {
+        return repository.montant();
+    }
+
+    @Override
+    public Double montantDateEncaissement(Date dateStart, Date dateEnd) {
+        return repository.montantDateEncaissement(dateStart, dateEnd);
+    }
 }

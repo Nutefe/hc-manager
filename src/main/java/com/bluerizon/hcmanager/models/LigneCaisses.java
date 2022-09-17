@@ -23,12 +23,12 @@ public class LigneCaisses implements Serializable
     private static final long serialVersionUID = 1L;
     @EmbeddedId
     protected CaissePK caissePK;
-    @Column(name = "solde")
-    private Double solde;
-    @Column(name = "recette")
-    private Double recette;
-    @Column(name = "decaissement")
-    private Double decaissement;
+//    @Column(name = "solde")
+//    private Double solde;
+//    @Column(name = "recette")
+//    private Double recette;
+//    @Column(name = "decaissement")
+//    private Double decaissement;
     @Column(name = "deleted")
     private boolean deleted;
     @Version
@@ -60,29 +60,29 @@ public class LigneCaisses implements Serializable
         this.caissePK = caissePK;
     }
 
-    public Double getSolde() {
-        return solde;
-    }
-
-    public void setSolde(Double solde) {
-        this.solde = solde;
-    }
-
-    public Double getRecette() {
-        return recette;
-    }
-
-    public void setRecette(Double recette) {
-        this.recette = recette;
-    }
-
-    public Double getDecaissement() {
-        return decaissement;
-    }
-
-    public void setDecaissement(Double decaissement) {
-        this.decaissement = decaissement;
-    }
+//    public Double getSolde() {
+//        return solde;
+//    }
+//
+//    public void setSolde(Double solde) {
+//        this.solde = solde;
+//    }
+//
+//    public Double getRecette() {
+//        return recette;
+//    }
+//
+//    public void setRecette(Double recette) {
+//        this.recette = recette;
+//    }
+//
+//    public Double getDecaissement() {
+//        return decaissement;
+//    }
+//
+//    public void setDecaissement(Double decaissement) {
+//        this.decaissement = decaissement;
+//    }
 
     public boolean isDeleted() {
         return deleted;
@@ -121,11 +121,22 @@ public class LigneCaisses implements Serializable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         LigneCaisses that = (LigneCaisses) o;
-        return deleted == that.deleted && version == that.version && Objects.equals(caissePK, that.caissePK) && Objects.equals(solde, that.solde) && Objects.equals(recette, that.recette) && Objects.equals(decaissement, that.decaissement) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return deleted == that.deleted && version == that.version && Objects.equals(caissePK, that.caissePK) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(caissePK, solde, recette, decaissement, deleted, version, createdAt, updatedAt);
+        return Objects.hash(caissePK, deleted, version, createdAt, updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        return "LigneCaisses{" +
+                "caissePK=" + caissePK +
+                ", deleted=" + deleted +
+                ", version=" + version +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
     }
 }

@@ -61,4 +61,9 @@ public class DepenseReserveService implements DepenseReserveDao {
     public Double montantTotalReserves() {
         return repository.montantTotalReserves();
     }
+
+    @Override
+    public Double montantDateDepense(Date dateStart, Date dateEnd) {
+        return repository.montantDateDepense(dateStart, dateEnd);
+    }
 }

@@ -113,6 +113,29 @@ public class FileController
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
+    @GetMapping({ "/downloadFile/attachment/{fileName:.+}" })
+    public ResponseEntity<Resource> downloadFileAtt(@PathVariable final String fileName, final HttpServletRequest request)throws IOException {
+        Resource resource = fileStorageService.loadAsResource(fileName);
+
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
     
     @GetMapping({ "/downloadAvatar/{fileName:.+}" })
     public ResponseEntity<Resource> downloadAvatar(@PathVariable final String fileName, final HttpServletRequest request) {

@@ -47,4 +47,8 @@ public interface EncaissementsDao {
     List<Factures> rechercheFacture(final Date dateEncaissement, String search, Pageable pageable);
     Long countRechercheFacture(final Date dateEncaissement, String search);
 
+    Double montant();
+
+    Double montantDateEncaissement(final Date dateStart, final Date dateEnd);
+
 }

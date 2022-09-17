@@ -76,7 +76,7 @@ public interface EncaissementsRepository extends JpaRepository<Encaissements, Lo
             " AND (e.dateEncaissement = :dateEncaissement AND e.deleted = false)")
     Long countRecherche(final Date dateEncaissement, String search);
 
-    @Query("SELECT SUM(e.montant) FROM Encaissements e where e.deleted = false AND e.dateEncaissement =:startDate")
+    @Query("SELECT COALESCE(SUM(e.montant), 0) FROM Encaissements e where e.deleted = false AND e.dateEncaissement =:startDate")
     Double montantDate(final Date startDate);
 
     @Query("SELECT DISTINCT COUNT(e.facture) FROM Encaissements e WHERE e.deleted = false AND e.dateEncaissement =:start  ORDER BY e.id")
@@ -110,4 +110,10 @@ public interface EncaissementsRepository extends JpaRepository<Encaissements, Lo
             " e.facture.fiche.patient.assurance.libelle LIKE CONCAT('%',:search,'%'))" +
             " AND (e.dateEncaissement = :dateEncaissement AND e.deleted = false) ORDER BY e.id")
     Long countRechercheFacture(final Date dateEncaissement, String search);
+
+    @Query("SELECT COALESCE(SUM(e.montant), 0) FROM Encaissements e where e.deleted = false")
+    Double montant();
+
+    @Query("SELECT COALESCE(SUM(e.montant), 0) FROM Encaissements e WHERE e.dateEncaissement BETWEEN :dateStart AND :dateEnd  AND e.deleted = false")
+    Double montantDateEncaissement(final Date dateStart, final Date dateEnd);
 }

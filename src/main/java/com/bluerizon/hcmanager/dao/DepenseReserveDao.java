@@ -28,4 +28,6 @@ public interface DepenseReserveDao {
     Double montantReserves(final Date dateDepense);
 
     Double montantTotalReserves();
+
+    Double montantDateDepense(final Date dateStart, final Date dateEnd);
 }

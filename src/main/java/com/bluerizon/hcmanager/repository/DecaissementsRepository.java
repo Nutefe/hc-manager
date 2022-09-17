@@ -84,17 +84,20 @@ public interface DecaissementsRepository extends JpaRepository<Decaissements, Lo
     Long countRechercheCaisse(final Caisses caisse, final Date dateDecaissement, String search);
 
 
-    @Query("SELECT SUM(d.montant) FROM Decaissements d WHERE d.ligneCaisse.caissePK.caisse=:caisse AND " +
+    @Query("SELECT COALESCE(SUM(d.montant),0) FROM Decaissements d WHERE d.ligneCaisse.caissePK.caisse=:caisse AND " +
             "d.dateDecaissement = :dateDecaissement AND d.deleted = false")
     Long montantDateByCaisse(Caisses caisse, final Date dateDecaissement);
 
-    @Query("SELECT SUM(d.montant) FROM Decaissements d WHERE d.ligneCaisse.caissePK.caisse=:caisse AND d.deleted = false")
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM Decaissements d WHERE d.ligneCaisse.caissePK.caisse=:caisse AND d.deleted = false")
     Double montantByCaisse(Caisses caisse);
 
-    @Query("SELECT SUM(d.montant) FROM Decaissements d WHERE d.dateDecaissement = :dateDecaissement AND d.deleted = false")
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM Decaissements d WHERE d.dateDecaissement = :dateDecaissement AND d.deleted = false")
     Double montantDateDecaissements(final Date dateDecaissement);
 
-    @Query("SELECT SUM(d.montant) FROM Decaissements d WHERE d.deleted = false")
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM Decaissements d WHERE d.deleted = false")
     Double montantTotalDecaissements();
+
+    @Query("SELECT COALESCE(SUM(d.montant), 0) FROM Decaissements d WHERE d.dateDecaissement BETWEEN :dateStart AND :dateEnd  AND d.deleted = false")
+    Double montantDateDecaissements(final Date dateStart, final Date dateEnd);
 
 }

@@ -16,7 +16,7 @@ public class CaissePK implements Serializable
     @JoinColumn(name = "caisse", referencedColumnName = "id", nullable = false)
     @ManyToOne(optional = false)
     private Caisses caisse;
-    @JoinColumn(name = "utilisateur", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "utilisateur", referencedColumnName = "id", unique = true, nullable = false)
     @ManyToOne(optional = false)
     private Utilisateurs utilisateur;
 

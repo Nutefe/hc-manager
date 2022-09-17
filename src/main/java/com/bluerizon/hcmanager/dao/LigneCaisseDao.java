@@ -11,6 +11,7 @@ public interface LigneCaisseDao {
     Optional<LigneCaisses> selectOne(CaissePK caissePK);
 
     LigneCaisses findFirstByUser(final Utilisateurs utilisateur);
+    LigneCaisses findFirstByUserCaisse(final Utilisateurs utilisateur);
 
     LigneCaisses save(LigneCaisses ligneCaisse);
 

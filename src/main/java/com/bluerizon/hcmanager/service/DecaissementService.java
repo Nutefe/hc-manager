@@ -133,4 +133,9 @@ public class DecaissementService implements DecaissementDao {
     public Double montantTotalDecaissements() {
         return repository.montantTotalDecaissements();
     }
+
+    @Override
+    public Double montantDateDecaissements(Date dateStart, Date dateEnd) {
+        return repository.montantDateDecaissements(dateStart, dateEnd);
+    }
 }

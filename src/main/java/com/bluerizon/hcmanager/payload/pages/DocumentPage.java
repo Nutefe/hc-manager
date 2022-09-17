@@ -1,12 +1,11 @@
 package com.bluerizon.hcmanager.payload.pages;
 
-import com.bluerizon.hcmanager.models.Caisses;
-import com.bluerizon.hcmanager.models.Reserves;
-import com.bluerizon.hcmanager.payload.response.LigneResponse;
+import com.bluerizon.hcmanager.models.Documents;
+import com.bluerizon.hcmanager.models.TypeTraitements;
 
 import java.util.List;
 
-public class CaissePage {
+public class DocumentPage {
     private Long total;
     private Integer per_page;
     private Integer current_page;
@@ -18,9 +17,9 @@ public class CaissePage {
     private String path;
     private Long from;
     private Long to;
-    private List<LigneResponse> data;
+    private List<Documents> data;
 
-    public CaissePage() {
+    public DocumentPage() {
     }
 
     public Long getTotal() {
@@ -111,11 +110,11 @@ public class CaissePage {
         this.to = to;
     }
 
-    public List<LigneResponse> getData() {
+    public List<Documents> getData() {
         return data;
     }
 
-    public void setData(List<LigneResponse> data) {
+    public void setData(List<Documents> data) {
         this.data = data;
     }
 }

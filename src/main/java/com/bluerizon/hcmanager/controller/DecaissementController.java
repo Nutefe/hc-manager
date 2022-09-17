@@ -5,6 +5,7 @@
 package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.*;
+import com.bluerizon.hcmanager.exception.BadRequestException;
 import com.bluerizon.hcmanager.models.*;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.DecaissementPage;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -77,6 +79,8 @@ public class DecaissementController
     private UtilisateursDao utilisateursDao;
     @Autowired
     private CaisseDao caisseDao;
+    @Autowired
+    private ReserveDao reserveDao;
 
     @GetMapping("/decaissement/{id}")
     public Decaissements getOne(@PathVariable("id") final Long id) {
@@ -519,7 +523,6 @@ public class DecaissementController
 
         return pages;
     }
-
     @RequestMapping(value ="/decaissements/caisse/today/page/{page}", method = RequestMethod.GET)
     @ResponseBody
     public DecaissementPage selectAllPageCaisseToday(@PathVariable(value = "page") int page,
@@ -573,7 +576,6 @@ public class DecaissementController
 
         return pages;
     }
-
     @RequestMapping(value = "/decaissements/caisse/today/search/page/{page}/{s}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public DecaissementPage searchDecaissementPageCaisseToday(@PathVariable(value = "page") int page,
@@ -632,7 +634,6 @@ public class DecaissementController
 
         return pages;
     }
-
     @RequestMapping(value ="/decaissements/caisse/date/page/{date}/{page}", method = RequestMethod.GET)
     @ResponseBody
     public DecaissementPage selectAllPageCaisseDate(@PathVariable(value = "page") int page,
@@ -687,7 +688,6 @@ public class DecaissementController
 
         return pages;
     }
-
     @RequestMapping(value = "/decaissements/caisse/date/search/page/{date}/{page}/{s}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public DecaissementPage searchDecaissementPageCaisseDate(@PathVariable(value = "page") int page,
@@ -747,30 +747,75 @@ public class DecaissementController
 
         return pages;
     }
-
     @RequestMapping(value = "/decaissement", method =  RequestMethod.POST)
-    public Decaissements save(@Valid @RequestBody Decaissements request,
-                                         @CurrentUser final UserDetailsImpl currentUser) {
+    public ResponseEntity<?> save(@Valid @RequestBody Decaissements request,
+                               @CurrentUser final UserDetailsImpl currentUser) {
         Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
         LigneCaisses ligneCaisse = this.ligneCaisseDao.findFirstByUser(utilisateur);
-        request.setMotif(request.getMotif());
-        request.setMontant(request.getMontant());
-        request.setDateDecaissement(new Date());
-        request.setType(request.getType());
-        request.setLigneCaisse(ligneCaisse);
-        return this.decaissementDao.save(request);
-    }
+        Caisses caisse = ligneCaisse.getCaissePK().getCaisse();
 
+        if (caisse.getSolde()>= request.getMontant()){
+            caisse.setSolde(caisse.getSolde() - request.getMontant());
+            caisse.setDecaissement(caisse.getDecaissement() + request.getMontant());
+            this.caisseDao.save(caisse);
+            request.setMotif(request.getMotif());
+            request.setMontant(request.getMontant());
+            request.setDateDecaissement(new Date());
+            request.setType(request.getType());
+            request.setLigneCaisse(ligneCaisse);
+            return ResponseEntity.ok(this.decaissementDao.save(request));
+        } else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
+        }
+    }
+    @RequestMapping(value = "/decaissement/reserve", method =  RequestMethod.POST)
+    public ResponseEntity<?> saveReserve(@CurrentUser final UserDetailsImpl currentUser) {
+        Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        LigneCaisses ligneCaisse = this.ligneCaisseDao.findFirstByUser(utilisateur);
+        Caisses caisse = ligneCaisse.getCaissePK().getCaisse();
+        Reserves reserve = this.reserveDao.findByCaisseAndDeletedFalse(caisse);
+
+        if (caisse.getSolde()>= reserve.getMontantSuivant()){
+            caisse.setSolde(caisse.getSolde() - reserve.getMontantSuivant());
+            caisse.setDecaissement(caisse.getDecaissement() + reserve.getMontantSuivant());
+            this.caisseDao.save(caisse);
+            Decaissements request = new Decaissements();
+            request.setMotif("decaissement reserve");
+            request.setMontant(reserve.getMontantSuivant());
+            request.setDateDecaissement(new Date());
+            request.setLigneCaisse(ligneCaisse);
+            return ResponseEntity.ok(this.decaissementDao.save(request));
+        } else {
+            caisse.setSolde(caisse.getSolde() - caisse.getSolde());
+            caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
+            this.caisseDao.save(caisse);
+            Decaissements request = new Decaissements();
+            request.setMotif("decaissement reserve");
+            request.setMontant(caisse.getSolde());
+            request.setDateDecaissement(new Date());
+            request.setLigneCaisse(ligneCaisse);
+            return ResponseEntity.ok(this.decaissementDao.save(request));
+        }
+    }
     @RequestMapping(value = "/decaissement/{id}", method =  RequestMethod.PUT)
-    public Decaissements update(@Valid @RequestBody Decaissements request, @PathVariable("id") final Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody Decaissements request, @PathVariable("id") final Long id) {
         Decaissements decaissementInit = this.decaissementDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        decaissementInit.setMotif(request.getMotif());
-        decaissementInit.setMontant(request.getMontant());
-        decaissementInit.setDateDecaissement(new Date());
-        decaissementInit.setType(request.getType());
-        return this.decaissementDao.save(decaissementInit);
-    }
+        Caisses caisse = decaissementInit.getLigneCaisse().getCaissePK().getCaisse();
+        if ((caisse.getSolde() + decaissementInit.getMontant()) >= request.getMontant()){
 
+            caisse.setSolde((caisse.getSolde() + decaissementInit.getMontant()) - request.getMontant());
+            caisse.setDecaissement((caisse.getDecaissement() - decaissementInit.getMontant()) + request.getMontant());
+            this.caisseDao.save(caisse);
+
+            decaissementInit.setMotif(request.getMotif());
+            decaissementInit.setMontant(request.getMontant());
+            decaissementInit.setDateDecaissement(new Date());
+            decaissementInit.setType(request.getType());
+            return ResponseEntity.ok(this.decaissementDao.save(decaissementInit));
+        } else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
+        }
+    }
     @RequestMapping(value = { "/decaissement/montant/date/{date}" }, method = { RequestMethod.GET })
     @ResponseStatus(HttpStatus.OK)
     public Double montantDate(@PathVariable("date") final String date) {

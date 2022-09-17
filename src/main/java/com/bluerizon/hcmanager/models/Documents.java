@@ -17,10 +17,10 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "caisses")
+@Table(name = "documents")
 @JsonIgnoreProperties(value = {"updatedAt",  "deleted"})
 @EntityListeners({ AuditingEntityListener.class })
-public class Caisses implements Serializable
+public class Documents implements Serializable
 {
     private static final long serialVersionUID = 1L;
     @Id
@@ -31,14 +31,8 @@ public class Caisses implements Serializable
     private Integer id;
     @Column(name = "libelle", length = 50)
     private String libelle;
-    @Column(name = "montant")
-    private Double montant;
-    @Column(name = "solde")
-    private Double solde;
-    @Column(name = "recette")
-    private Double recette;
-    @Column(name = "decaissement")
-    private Double decaissement;
+    @Column(name = "url", length = 50)
+    private String url;
     @Column(name = "deleted", columnDefinition = "tinyint(1) default 0")
     private boolean deleted;
     @CreatedDate
@@ -52,11 +46,16 @@ public class Caisses implements Serializable
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private Date updatedAt;
 
-    public Caisses() {
+    public Documents() {
     }
 
-    public Caisses(Integer id) {
+    public Documents(Integer id) {
         this.id = id;
+    }
+
+    public Documents(String libelle, String url) {
+        this.libelle = libelle;
+        this.url = url;
     }
 
     public Integer getId() {
@@ -75,36 +74,12 @@ public class Caisses implements Serializable
         this.libelle = libelle;
     }
 
-    public Double getMontant() {
-        return montant;
+    public String getUrl() {
+        return url;
     }
 
-    public void setMontant(Double montant) {
-        this.montant = montant;
-    }
-
-    public Double getSolde() {
-        return solde;
-    }
-
-    public void setSolde(Double solde) {
-        this.solde = solde;
-    }
-
-    public Double getRecette() {
-        return recette;
-    }
-
-    public void setRecette(Double recette) {
-        this.recette = recette;
-    }
-
-    public Double getDecaissement() {
-        return decaissement;
-    }
-
-    public void setDecaissement(Double decaissement) {
-        this.decaissement = decaissement;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public boolean isDeleted() {
@@ -135,27 +110,23 @@ public class Caisses implements Serializable
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Caisses caisses = (Caisses) o;
-        return deleted == caisses.deleted && Objects.equals(id, caisses.id) && Objects.equals(libelle, caisses.libelle) &&
-                Objects.equals(montant, caisses.montant) && Objects.equals(solde, caisses.solde) &&
-                Objects.equals(recette, caisses.recette) && Objects.equals(decaissement, caisses.decaissement) &&
-                Objects.equals(createdAt, caisses.createdAt) && Objects.equals(updatedAt, caisses.updatedAt);
+        Documents documents = (Documents) o;
+        return deleted == documents.deleted && Objects.equals(id, documents.id) && Objects.equals(libelle, documents.libelle) &&
+                Objects.equals(url, documents.url) && Objects.equals(createdAt, documents.createdAt) &&
+                Objects.equals(updatedAt, documents.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, libelle, montant, solde, recette, decaissement, deleted, createdAt, updatedAt);
+        return Objects.hash(id, libelle, url, deleted, createdAt, updatedAt);
     }
 
     @Override
     public String toString() {
-        return "Caisses{" +
+        return "Documents{" +
                 "id=" + id +
                 ", libelle='" + libelle + '\'' +
-                ", montant=" + montant +
-                ", solde=" + solde +
-                ", recette=" + recette +
-                ", decaissement=" + decaissement +
+                ", url='" + url + '\'' +
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
