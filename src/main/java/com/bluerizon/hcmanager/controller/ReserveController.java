@@ -6,22 +6,32 @@ package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.exception.BadRequestException;
-import com.bluerizon.hcmanager.models.Assurances;
-import com.bluerizon.hcmanager.models.Caisses;
-import com.bluerizon.hcmanager.models.Reserves;
+import com.bluerizon.hcmanager.models.*;
+import com.bluerizon.hcmanager.payload.genarate.GenarateEtatCaisse;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.AssurancePage;
 import com.bluerizon.hcmanager.payload.pages.ReservePage;
+import com.bluerizon.hcmanager.security.jwt.CurrentUser;
+import com.bluerizon.hcmanager.security.services.UserDetailsImpl;
+import com.bluerizon.hcmanager.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +61,12 @@ public class ReserveController
     private DecaissementDao decaissementDao;
     @Autowired
     private DepenseReserveDao depenseReserveDao;
+    private final Logger logger;
+    @Autowired
+    private StorageService fileStorageService;
+    public ReserveController() {
+        this.logger = LoggerFactory.getLogger((Class)this.getClass());
+    }
 
     @GetMapping("/reserve/{id}")
     public Reserves getOne(@PathVariable("id") final Integer id) {
@@ -246,66 +262,32 @@ public class ReserveController
         reserve.setMontantDefini(request.getMontantDefini());
 //        System.out.println(reserveSecond.getMontantSuivant());
 //        System.out.println(request.getMontantDefini());
-        if (request.getMontantDefini() <= reserveSecond.getMontantSuivant()){
-            if (request.getMontantDefini() == reserveSecond.getMontantSuivant()){
-                System.out.println(reserveSecond.getMontantDefini());
-                reserve.setMontantReserve(request.getMontantDefini());
-                reserve.setMontantSuivant(reserveInit.getMontantDefini());
-                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
-                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
-                this.caisseDao.save(caisse);
-                return ResponseEntity.ok(this.reserveDao.save(reserve));
-            } else{
-                reserve.setMontantReserve(request.getMontantDefini());
-                reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
-                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
-                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
-                this.caisseDao.save(caisse);
-                return ResponseEntity.ok(this.reserveDao.save(reserve));
+        if (request.getMontantDefini() <= caisse.getSolde()){
+            if (request.getMontantDefini() <= reserveSecond.getMontantSuivant()){
+                if (request.getMontantDefini() == reserveSecond.getMontantSuivant()){
+//                    System.out.println(reserveSecond.getMontantDefini());
+                    reserve.setMontantReserve(request.getMontantDefini());
+                    reserve.setMontantSuivant(reserveInit.getMontantDefini());
+                    caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                    caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                    this.caisseDao.save(caisse);
+                    return ResponseEntity.ok(this.reserveDao.save(reserve));
+                } else{
+                    reserve.setMontantReserve(request.getMontantDefini());
+                    reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
+                    caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                    caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                    this.caisseDao.save(caisse);
+                    return ResponseEntity.ok(this.reserveDao.save(reserve));
+                }
             }
-        }
-        else {
+            else {
+                return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au montant normal a reserve"));
+            }
+        } else {
             return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
         }
 
-//        Double enc = this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate()));
-//        Double dec = this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate()));
-
-//        Long nd = Helpers.dayBetween(reserveInit.getDateSuivant(), new Date());
-
-//        if (nd == 0){
-//            if (caisse.getSolde() >= reserveInit.getMontantSuivant()){
-//                reserve.setMontantReserve(reserveInit.getMontantSuivant());
-//                reserve.setMontantSuivant(reserveInit.getMontantDefini());
-//                caisse.setDecaissement(caisse.getDecaissement() + reserveInit.getMontantSuivant());
-//                caisse.setSolde(caisse.getSolde() - reserveInit.getMontantSuivant());
-//                this.caisseDao.save(caisse);
-//            } else {
-//                reserve.setMontantReserve(caisse.getSolde());
-//                reserve.setMontantSuivant((reserveInit.getMontantSuivant() - caisse.getSolde()) + reserveInit.getMontantDefini());
-//                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
-//                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
-//                this.caisseDao.save(caisse);
-//            }
-//            return ResponseEntity.ok(this.reserveDao.save(reserve));
-//        } else if (nd > 0) {
-//            if (caisse.getSolde() >= (reserveInit.getMontantSuivant()*nd)){
-//                reserve.setMontantReserve(reserveInit.getMontantSuivant()*nd);
-//                reserve.setMontantSuivant(reserveInit.getMontantDefini());
-//                caisse.setDecaissement(caisse.getDecaissement() + (reserveInit.getMontantSuivant()*nd));
-//                caisse.setSolde(caisse.getSolde() - (reserveInit.getMontantSuivant()*nd));
-//                this.caisseDao.save(caisse);
-//            } else {
-//                reserve.setMontantReserve(caisse.getSolde());
-//                reserve.setMontantSuivant(((reserveInit.getMontantSuivant()*nd) - caisse.getSolde()) + reserveInit.getMontantDefini());
-//                caisse.setDecaissement(caisse.getDecaissement() + caisse.getSolde());
-//                caisse.setSolde(caisse.getSolde() - caisse.getSolde());
-//                this.caisseDao.save(caisse);
-//            }
-//            return ResponseEntity.ok(this.reserveDao.save(reserve));
-//        } else {
-//            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
-//        }
     }
 
     @RequestMapping(value = "/reserve/{id}", method =  RequestMethod.PUT)
@@ -344,6 +326,33 @@ public class ReserveController
     public Double montantReserve() {
         Double res = this.reserveDao.montantTotalReserves() - this.depenseReserveDao.montantTotalReserves();
         return res;
+    }
+
+    @RequestMapping(value = "/etat/reserve", method =  RequestMethod.GET)
+    public ResponseEntity<Resource> saveProforma(final HttpServletRequest requestServlet) throws IOException {
+        Double aDouble = this.reserveDao.montantTotalReserves();
+        Double aDouble1 = this.depenseReserveDao.montantTotalReserves();
+        File bis = GenarateEtatCaisse.etatReserve(aDouble, aDouble1);
+
+        final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = requestServlet.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentLength(bis.length()) //
+                .body(resource);
     }
     
     private Sort sortByCreatedDesc() {

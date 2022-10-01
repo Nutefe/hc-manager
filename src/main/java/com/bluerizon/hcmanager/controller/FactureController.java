@@ -7,9 +7,11 @@ package com.bluerizon.hcmanager.controller;
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.models.*;
 import com.bluerizon.hcmanager.payload.genarate.GenarateFacture;
+import com.bluerizon.hcmanager.payload.genarate.GenarateFactureProforma;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.EncaissementPage;
 import com.bluerizon.hcmanager.payload.pages.FacturePage;
+import com.bluerizon.hcmanager.payload.request.FactureProformaRequest;
 import com.bluerizon.hcmanager.payload.request.FactureRequest;
 import com.bluerizon.hcmanager.payload.request.TraitementRequest;
 import com.bluerizon.hcmanager.security.jwt.CurrentUser;
@@ -862,6 +864,32 @@ public class FactureController
         //return this.facturesDao.save(request);
     }
 
+    @RequestMapping(value = "/facture/proforma", method =  RequestMethod.POST)
+    public ResponseEntity<Resource> saveProforma(@Valid @RequestBody FactureProformaRequest request,
+                                         final HttpServletRequest requestServlet) throws IOException {
+
+        File bis = GenarateFactureProforma.etatPatient(request);
+
+        final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = requestServlet.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentLength(bis.length()) //
+                .body(resource);
+    }
     @RequestMapping(value = "/facture/count/day", method =  RequestMethod.GET)
     public Long countDay() {
         return this.facturesDao.countDate(Helpers.getDateFromString(Helpers.currentDate()));

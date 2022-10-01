@@ -6,8 +6,11 @@ package com.bluerizon.hcmanager.controller;
 
 import com.bluerizon.hcmanager.dao.CaisseDao;
 import com.bluerizon.hcmanager.dao.DepenseReserveDao;
+import com.bluerizon.hcmanager.dao.ReserveDao;
+import com.bluerizon.hcmanager.exception.BadRequestException;
 import com.bluerizon.hcmanager.models.Caisses;
 import com.bluerizon.hcmanager.models.DepenseReserves;
+import com.bluerizon.hcmanager.models.Reserves;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.CaissePage;
 import com.bluerizon.hcmanager.payload.pages.DepenseReservePage;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -38,9 +42,10 @@ public class DepenseReserveController
 
     @Value("${app.url_depense_reserves_search_page}")
     private String url_depense_reserves_search_page;
-
     @Autowired
     private DepenseReserveDao depenseReserveDao;
+    @Autowired
+    private ReserveDao reserveDao;
 
     @GetMapping("/depense/reserve/{id}")
     public DepenseReserves getOne(@PathVariable("id") final Long id) {
@@ -160,20 +165,32 @@ public class DepenseReserveController
     }
 
     @RequestMapping(value = "/depense/reserve", method =  RequestMethod.POST)
-    public DepenseReserves save(@Valid @RequestBody DepenseReserves request) {
-        request.setMotif(request.getMotif());
-        request.setMontant(request.getMontant());
-        request.setDateDepense(new Date());
-        return this.depenseReserveDao.save(request);
+    public ResponseEntity<?> save(@Valid @RequestBody DepenseReserves request) {
+        Double reserve = this.reserveDao.montantTotalReserves();
+        Double depense = this.depenseReserveDao.montantTotalReserves();
+        if (request.getMontant() <= (reserve - depense)){
+            request.setMotif(request.getMotif());
+            request.setMontant(request.getMontant());
+            request.setDateDepense(new Date());
+            return ResponseEntity.ok(this.depenseReserveDao.save(request));
+        } else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur a la reserve"));
+        }
     }
 
     @RequestMapping(value = "/depense/reserve/{id}", method =  RequestMethod.PUT)
-    public DepenseReserves update(@Valid @RequestBody DepenseReserves request, @PathVariable("id") final Long id) {
+    public ResponseEntity<?> update(@Valid @RequestBody DepenseReserves request, @PathVariable("id") final Long id) {
         DepenseReserves depenseReserveInit = this.depenseReserveDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));
-        depenseReserveInit.setMotif(request.getMotif());
-        depenseReserveInit.setMontant(request.getMontant());
-        depenseReserveInit.setDateDepense(new Date());
-        return this.depenseReserveDao.save(depenseReserveInit);
+        Double reserve = this.reserveDao.montantTotalReserves();
+        Double depense = this.depenseReserveDao.montantTotalReserves();
+        if (request.getMontant() <= ((reserve + depenseReserveInit.getMontant()) - depense)){
+            depenseReserveInit.setMotif(request.getMotif());
+            depenseReserveInit.setMontant(request.getMontant());
+            depenseReserveInit.setDateDepense(new Date());
+            return ResponseEntity.ok(this.depenseReserveDao.save(depenseReserveInit));
+        } else {
+            return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur a la reserve"));
+        }
     }
 
     @RequestMapping(value = { "/depense/reserve/montant/date/{date}" }, method = { RequestMethod.GET })

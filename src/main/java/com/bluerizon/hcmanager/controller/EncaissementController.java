@@ -7,6 +7,7 @@ package com.bluerizon.hcmanager.controller;
 import com.bluerizon.hcmanager.dao.*;
 import com.bluerizon.hcmanager.exception.NotFoundRequestException;
 import com.bluerizon.hcmanager.models.*;
+import com.bluerizon.hcmanager.payload.genarate.GenarateEtatCaisse;
 import com.bluerizon.hcmanager.payload.genarate.GenarateFacture;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.pages.EncaissementPage;
@@ -733,6 +734,36 @@ public class EncaissementController
         etatRecette.setMontantDepense(this.depenseReserveDao.montantDateDepense(Helpers.getDateFromString(dateStart), Helpers.getDateFromString(dateEnd)));
 
         return etatRecette;
+    }
+
+
+    @RequestMapping(value = "/etat/caisse", method =  RequestMethod.GET)
+    public ResponseEntity<Resource> saveProforma(@CurrentUser final UserDetailsImpl currentUser,
+                                                 final HttpServletRequest requestServlet) throws IOException {
+        Utilisateurs utilisateur = this.utilisateursDao.findById(currentUser.getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+        LigneCaisses ligneCaisse = this.ligneCaisseDao.findFirstByUser(utilisateur);
+
+        File bis = GenarateEtatCaisse.etatCaisse(ligneCaisse.getCaissePK().getCaisse());
+
+        final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
+        // Try to determine file's content type
+        String contentType = null;
+        try {
+            contentType = requestServlet.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            logger.info("Could not determine file type.");
+        }
+
+        // Fallback to the default content type if type could not be determined
+        if(contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .contentLength(bis.length()) //
+                .body(resource);
     }
 
     @RequestMapping(value = "/encaissement/{id}", method =  RequestMethod.DELETE)
