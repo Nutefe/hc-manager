@@ -204,16 +204,22 @@ public class DepenseReserveController
             depenseReserveInit.setTotal(request.isTotal());
             DepenseReserves depenseReserves = this.depenseReserveDao.save(depenseReserveInit);
             if (request.isTotal()){
-                List<Reserves> reserves = this.reserveDao.selectAllReserves();
-                reserves.forEach( item -> {
-                    item.setDeleted(true);
-                    this.reserveDao.save(item);
-                });
-                List<DepenseReserves> depenseReservesDel = this.depenseReserveDao.findByDeletedFalse();
-                depenseReservesDel.forEach( item ->{
-                    item.setDeleted(true);
-                    this.depenseReserveDao.save(item);
-                });
+                Reserves reserveIn = this.reserveDao.findTop1ByDeletedFalse();
+                if (reserveIn.isFinale()){
+                    List<Reserves> reserves = this.reserveDao.selectAllReserves();
+                    reserves.forEach( item -> {
+                        if (item.isFinale()){
+                            item.setDeleted(true);
+                            this.reserveDao.save(item);
+                        }
+                    });
+                    List<DepenseReserves> depenseReservesDel = this.depenseReserveDao.findByDeletedFalse();
+                    depenseReservesDel.forEach( item ->{
+                        item.setDeleted(true);
+                        this.depenseReserveDao.save(item);
+                    });
+                }
+
             }
             return ResponseEntity.ok(depenseReserves);
         } else {

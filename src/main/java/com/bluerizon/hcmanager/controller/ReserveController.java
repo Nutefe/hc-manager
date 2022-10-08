@@ -267,14 +267,32 @@ public class ReserveController
                 caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
                 caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
                 this.caisseDao.save(caisse);
-                return ResponseEntity.ok(this.reserveDao.save(reserve));
+                Reserves reserveSave = this.reserveDao.save(reserve);
+                if (reserveSave.isFinale()){
+                    List<Reserves> reserves = this.reserveDao.selectAllReserves();
+                    reserves.forEach( item -> {
+                        item.setFinale(true);
+                        this.reserveDao.save(item);
+                    });
+                }
+
+                return ResponseEntity.ok(reserveSave);
             } else{
                 reserve.setMontantReserve(request.getMontantDefini());
                 reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
                 caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
                 caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
                 this.caisseDao.save(caisse);
-                return ResponseEntity.ok(this.reserveDao.save(reserve));
+                Reserves reserveSave = this.reserveDao.save(reserve);
+                if (reserveSave.isFinale()){
+                    List<Reserves> reserves = this.reserveDao.selectAllReserves();
+                    reserves.forEach( item -> {
+                        item.setFinale(true);
+                        this.reserveDao.save(item);
+                    });
+                }
+
+                return ResponseEntity.ok(reserveSave);
             }
         } else {
             return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
