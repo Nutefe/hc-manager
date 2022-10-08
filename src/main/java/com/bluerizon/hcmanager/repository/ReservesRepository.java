@@ -17,6 +17,9 @@ public interface ReservesRepository extends JpaRepository<Reserves, Integer> {
     Reserves findByCaisseAndDeletedFalse(Caisses caisse);
     Reserves findTop1ByDeletedFalseOrderByIdDesc();
     Reserves findFirst1ByDeletedFalseOrderByIdAsc();
+    @Query("SELECT r FROM Reserves r WHERE r.deleted = false AND r.id!=1")
+    List<Reserves> selectAllReserves();
+
     List<Reserves> findByDeletedFalse(Pageable pageable);
 
     @Query("SELECT r FROM Reserves r WHERE r.libelle LIKE CONCAT('%',:search,'%') AND (r.deleted = false)")

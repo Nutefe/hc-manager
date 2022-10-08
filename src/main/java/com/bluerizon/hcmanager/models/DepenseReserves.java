@@ -38,6 +38,8 @@ public class DepenseReserves implements Serializable
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateDepense;
+    @Column(name = "total", columnDefinition = "tinyint(1) default 0")
+    private boolean total;
     @Column(name = "deleted", columnDefinition = "tinyint(1) default 0")
     private boolean deleted;
     @CreatedDate
@@ -96,6 +98,14 @@ public class DepenseReserves implements Serializable
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public boolean isTotal() {
+        return total;
+    }
+
+    public void setTotal(boolean total) {
+        this.total = total;
     }
 
     public Date getCreatedAt() {

@@ -54,6 +54,8 @@ public class Reserves implements Serializable
     @Temporal(TemporalType.DATE)
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date dateSuivant;
+    @Column(name = "finale", columnDefinition = "tinyint(1) default 0")
+    private boolean finale;
     @Column(name = "deleted", columnDefinition = "tinyint(1) default 0")
     private boolean deleted;
     @CreatedDate
@@ -154,6 +156,14 @@ public class Reserves implements Serializable
         this.montantReserve = montantReserve;
     }
 
+    public boolean isFinale() {
+        return finale;
+    }
+
+    public void setFinale(boolean finale) {
+        this.finale = finale;
+    }
+
     public boolean isDeleted() {
         return deleted;
     }
@@ -183,19 +193,12 @@ public class Reserves implements Serializable
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Reserves reserves = (Reserves) o;
-        return deleted == reserves.deleted && Objects.equals(id, reserves.id) && Objects.equals(caisse, reserves.caisse) &&
-                Objects.equals(libelle, reserves.libelle) && Objects.equals(jours, reserves.jours) &&
-                Objects.equals(heure, reserves.heure) && Objects.equals(montantDefini, reserves.montantDefini) &&
-                Objects.equals(montantReserve, reserves.montantReserve) &&
-                Objects.equals(montantSuivant, reserves.montantSuivant) && Objects.equals(dateReserve, reserves.dateReserve) &&
-                Objects.equals(dateSuivant, reserves.dateSuivant) && Objects.equals(createdAt, reserves.createdAt) &&
-                Objects.equals(updatedAt, reserves.updatedAt);
+        return finale == reserves.finale && deleted == reserves.deleted && Objects.equals(id, reserves.id) && Objects.equals(caisse, reserves.caisse) && Objects.equals(libelle, reserves.libelle) && Objects.equals(jours, reserves.jours) && Objects.equals(heure, reserves.heure) && Objects.equals(montantDefini, reserves.montantDefini) && Objects.equals(montantReserve, reserves.montantReserve) && Objects.equals(montantSuivant, reserves.montantSuivant) && Objects.equals(dateReserve, reserves.dateReserve) && Objects.equals(dateSuivant, reserves.dateSuivant) && Objects.equals(createdAt, reserves.createdAt) && Objects.equals(updatedAt, reserves.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, caisse, libelle, jours, heure, montantDefini, montantReserve, montantSuivant,
-                dateReserve, dateSuivant, deleted, createdAt, updatedAt);
+        return Objects.hash(id, caisse, libelle, jours, heure, montantDefini, montantReserve, montantSuivant, dateReserve, dateSuivant, finale, deleted, createdAt, updatedAt);
     }
 
     @Override
@@ -211,6 +214,7 @@ public class Reserves implements Serializable
                 ", montantSuivant=" + montantSuivant +
                 ", dateReserve=" + dateReserve +
                 ", dateSuivant=" + dateSuivant +
+                ", finale=" + finale +
                 ", deleted=" + deleted +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

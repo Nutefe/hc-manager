@@ -24,6 +24,8 @@ public interface ReserveDao {
 
     List<Reserves> findByDeletedFalse();
 
+    List<Reserves> selectAllReserves();
+
     List<Reserves> findByDeletedFalse(Pageable pageable);
 
     List<Reserves> recherche(String search, Pageable pageable);

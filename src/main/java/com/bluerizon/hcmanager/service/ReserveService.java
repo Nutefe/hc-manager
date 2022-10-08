@@ -48,6 +48,11 @@ public class ReserveService implements ReserveDao {
     }
 
     @Override
+    public List<Reserves> selectAllReserves() {
+        return repository.selectAllReserves();
+    }
+
+    @Override
     public List<Reserves> findByDeletedFalse(Pageable pageable) {
         return repository.findByDeletedFalse(pageable);
     }

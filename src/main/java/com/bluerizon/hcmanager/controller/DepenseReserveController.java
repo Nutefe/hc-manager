@@ -166,13 +166,27 @@ public class DepenseReserveController
 
     @RequestMapping(value = "/depense/reserve", method =  RequestMethod.POST)
     public ResponseEntity<?> save(@Valid @RequestBody DepenseReserves request) {
+        Reserves reserveInit = this.reserveDao.findTop1ByDeletedFalse();
         Double reserve = this.reserveDao.montantTotalReserves();
         Double depense = this.depenseReserveDao.montantTotalReserves();
         if (request.getMontant() <= (reserve - depense)){
             request.setMotif(request.getMotif());
             request.setMontant(request.getMontant());
             request.setDateDepense(new Date());
-            return ResponseEntity.ok(this.depenseReserveDao.save(request));
+            DepenseReserves depenseReserves = this.depenseReserveDao.save(request);
+            if (request.isTotal()){
+                List<Reserves> reserves = this.reserveDao.selectAllReserves();
+                reserves.forEach( item -> {
+                    item.setDeleted(true);
+                    this.reserveDao.save(item);
+                });
+                List<DepenseReserves> depenseReservesDel = this.depenseReserveDao.findByDeletedFalse();
+                depenseReservesDel.forEach( item ->{
+                    item.setDeleted(true);
+                    this.depenseReserveDao.save(item);
+                });
+            }
+            return ResponseEntity.ok(depenseReserves);
         } else {
             return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur a la reserve"));
         }
@@ -187,7 +201,21 @@ public class DepenseReserveController
             depenseReserveInit.setMotif(request.getMotif());
             depenseReserveInit.setMontant(request.getMontant());
             depenseReserveInit.setDateDepense(new Date());
-            return ResponseEntity.ok(this.depenseReserveDao.save(depenseReserveInit));
+            depenseReserveInit.setTotal(request.isTotal());
+            DepenseReserves depenseReserves = this.depenseReserveDao.save(depenseReserveInit);
+            if (request.isTotal()){
+                List<Reserves> reserves = this.reserveDao.selectAllReserves();
+                reserves.forEach( item -> {
+                    item.setDeleted(true);
+                    this.reserveDao.save(item);
+                });
+                List<DepenseReserves> depenseReservesDel = this.depenseReserveDao.findByDeletedFalse();
+                depenseReservesDel.forEach( item ->{
+                    item.setDeleted(true);
+                    this.depenseReserveDao.save(item);
+                });
+            }
+            return ResponseEntity.ok(depenseReserves);
         } else {
             return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur a la reserve"));
         }

@@ -255,34 +255,26 @@ public class ReserveController
         Reserves reserve = new Reserves();
         reserve.setCaisse(caisse);
         reserve.setLibelle(reserveInit.getLibelle().toUpperCase());
-//        reserve.setHeure(reserveInit.getHeure());
-//        reserve.setJours(reserveInit.getJours());
+        reserve.setJours(request.getJours());
         reserve.setDateReserve(new Date());
         reserve.setDateSuivant(Helpers.tomorowDate());
         reserve.setMontantDefini(request.getMontantDefini());
-//        System.out.println(reserveSecond.getMontantSuivant());
-//        System.out.println(request.getMontantDefini());
+        reserve.setFinale(request.isFinale());
         if (request.getMontantDefini() <= caisse.getSolde()){
-            if (request.getMontantDefini() <= reserveSecond.getMontantSuivant()){
-                if (request.getMontantDefini() == reserveSecond.getMontantSuivant()){
-//                    System.out.println(reserveSecond.getMontantDefini());
-                    reserve.setMontantReserve(request.getMontantDefini());
-                    reserve.setMontantSuivant(reserveInit.getMontantDefini());
-                    caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
-                    caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
-                    this.caisseDao.save(caisse);
-                    return ResponseEntity.ok(this.reserveDao.save(reserve));
-                } else{
-                    reserve.setMontantReserve(request.getMontantDefini());
-                    reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
-                    caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
-                    caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
-                    this.caisseDao.save(caisse);
-                    return ResponseEntity.ok(this.reserveDao.save(reserve));
-                }
-            }
-            else {
-                return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au montant normal a reserve"));
+            if (request.getMontantDefini() == reserveSecond.getMontantSuivant()){
+                reserve.setMontantReserve(request.getMontantDefini());
+                reserve.setMontantSuivant(reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                this.caisseDao.save(caisse);
+                return ResponseEntity.ok(this.reserveDao.save(reserve));
+            } else{
+                reserve.setMontantReserve(request.getMontantDefini());
+                reserve.setMontantSuivant((reserveSecond.getMontantSuivant() - request.getMontantDefini()) + reserveInit.getMontantDefini());
+                caisse.setDecaissement(caisse.getDecaissement() + request.getMontantDefini());
+                caisse.setSolde(caisse.getSolde() - request.getMontantDefini());
+                this.caisseDao.save(caisse);
+                return ResponseEntity.ok(this.reserveDao.save(reserve));
             }
         } else {
             return ResponseEntity.badRequest().body(new BadRequestException("Montant superieur au solde de la caisse"));
