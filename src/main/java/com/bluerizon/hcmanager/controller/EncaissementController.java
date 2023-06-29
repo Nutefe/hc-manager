@@ -552,9 +552,7 @@ public class EncaissementController
     }
     @RequestMapping(value = "/encaissement/montant/day", method =  RequestMethod.GET)
     public Double montantDay() {
-        return this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate())) -
-                (this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate())) +
-                this.reserveDao.montantDateReserves(Helpers.getDateFromString(Helpers.currentDate())));
+        return this.encaissementsDao.montantDate(Helpers.getDateFromString(Helpers.currentDate()));
     }
     @RequestMapping(value = "/encaissement/facture/day", method =  RequestMethod.GET)
     public Long countFactureDay() {

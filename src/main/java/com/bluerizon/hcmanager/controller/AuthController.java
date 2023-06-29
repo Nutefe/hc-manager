@@ -1,9 +1,11 @@
 package com.bluerizon.hcmanager.controller;
 
+import com.bluerizon.hcmanager.dao.AssurancesDao;
+import com.bluerizon.hcmanager.dao.FacturesDao;
 import com.bluerizon.hcmanager.dao.UtilisateursDao;
 import com.bluerizon.hcmanager.exception.TokenRefreshException;
-import com.bluerizon.hcmanager.models.RefreshTokens;
-import com.bluerizon.hcmanager.models.Utilisateurs;
+import com.bluerizon.hcmanager.models.*;
+import com.bluerizon.hcmanager.payload.request.EtatRequest;
 import com.bluerizon.hcmanager.payload.scheduling.DatabaseUtil;
 import com.bluerizon.hcmanager.payload.helper.Helpers;
 import com.bluerizon.hcmanager.payload.request.LoginRequest;
@@ -25,7 +27,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+
+import static com.bluerizon.hcmanager.payload.helper.Helpers.getDateFromString;
 
 @RestController
 @RequestMapping("/api")
@@ -48,6 +53,10 @@ public class AuthController {
   private final Object monitor = new Object();
 
   private final JdbcTemplate jdbcTemplate;
+  @Autowired
+  private AssurancesDao assurancesDao;
+  @Autowired
+  private FacturesDao facturesDao;
 
 @Autowired
   public AuthController(JdbcTemplate jdbcTemplate) {
@@ -97,5 +106,15 @@ public class AuthController {
             .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                     "Refresh token is not in database!"));
   }
+
+//  @RequestMapping(value = "/auth/test/etat", method =  RequestMethod.GET)
+//  public List<Factures> save(@Valid @RequestBody EtatRequest request) {
+//    Assurances assurance = this.assurancesDao.findById(request.getAssurance().getId()).orElseThrow(() -> new RuntimeException("Error: object is not found."));
+//    List<Factures> factures = this.facturesDao.etatEntreprise(assurance,
+//            getDateFromString(request.getStart()),
+//            getDateFromString(request.getEnd()));
+//    return  factures;
+//  }
+
 
 }

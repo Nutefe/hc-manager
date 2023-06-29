@@ -173,4 +173,19 @@ public class FactureService implements FacturesDao {
     public Factures findByFileName(String fileName) {
         return repository.findByFileName(fileName);
     }
+
+    @Override
+    public Double montantDate(Date dateFacture) {
+        return repository.montantDate(dateFacture);
+    }
+
+    @Override
+    public Double acompteDate(Date dateFacture) {
+        return repository.acompteDate(dateFacture);
+    }
+
+    @Override
+    public Double remiseDate(Date dateFacture) {
+        return repository.remiseDate(dateFacture);
+    }
 }

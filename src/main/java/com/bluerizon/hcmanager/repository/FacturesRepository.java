@@ -166,6 +166,12 @@ public interface FacturesRepository extends JpaRepository<Factures, Long> {
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE f.deleted = false AND f.dateFacture=:dateFacture")
     Long countFactures(Date dateFacture);
+    @Query("SELECT COALESCE(SUM(f.total), 0) FROM Factures f where f.deleted = false AND f.dateFacture =:dateFacture")
+    Double montantDate(final Date dateFacture);
+    @Query("SELECT COALESCE(SUM(f.acompte), 0) FROM Factures f where f.deleted = false AND f.dateFacture =:dateFacture")
+    Double acompteDate(final Date dateFacture);
+    @Query("SELECT COALESCE(SUM(f.remise), 0) FROM Factures f where f.deleted = false AND f.dateFacture =:dateFacture")
+    Double remiseDate(final Date dateFacture);
 
     @Query("SELECT COUNT(f) FROM Factures f WHERE (f.dateFacture LIKE CONCAT('%',:search,'%') OR " +
             " f.numero LIKE CONCAT('%',:search,'%') OR " +

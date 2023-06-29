@@ -898,6 +898,14 @@ public class FactureController
     public Long count() {
         return this.facturesDao.countFactures();
     }
+    @RequestMapping(value = "/facture/acompte/day", method =  RequestMethod.GET)
+    public Double montantAcompteDay() {
+        return this.facturesDao.acompteDate(Helpers.getDateFromString(Helpers.currentDate()));
+    }
+    @RequestMapping(value = "/facture/montant/day", method =  RequestMethod.GET)
+    public Double montantDay() {
+        return this.facturesDao.montantDate(Helpers.getDateFromString(Helpers.currentDate())) - this.facturesDao.remiseDate(Helpers.getDateFromString(Helpers.currentDate()));
+    }
     @RequestMapping(value = "/facture/{id}", method =  RequestMethod.DELETE)
     public void delete(@PathVariable("id") final Long id) {
         Factures factureInit = this.facturesDao.findById(id).orElseThrow(() -> new RuntimeException("Error: object is not found."));

@@ -62,4 +62,8 @@ public interface FacturesDao {
     boolean existsByFileName(@Param("fileName") final String fileName, @Param("id") final Long id);
     Factures findByFileName(String fileName);
 
+    Double montantDate(final Date dateFacture);
+    Double acompteDate(final Date dateFacture);
+    Double remiseDate(final Date dateFacture);
+
 }

@@ -846,7 +846,9 @@ public class DecaissementController
     @RequestMapping(value = { "/decaissement/caisse/montant/today" }, method = { RequestMethod.GET })
     @ResponseStatus(HttpStatus.OK)
     public Double montantCaisseDate() {
-        return this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate()));
+        return (this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate())) +
+                this.reserveDao.montantDateReserves(Helpers.getDateFromString(Helpers.currentDate())));
+//        return this.decaissementDao.montantDateDecaissements(Helpers.getDateFromString(Helpers.currentDate()));
     }
 
     @RequestMapping(value = "/decaissement/{id}", method =  RequestMethod.DELETE)
