@@ -24,7 +24,7 @@ public interface AssurancesRepository extends JpaRepository<Assurances, Integer>
             " AND (a.deleted = false)")
     Long countRecherche(String search);
 
-    @Query("SELECT a FROM Assurances a WHERE a.deleted = false AND a.id !=1")
+    @Query("SELECT a FROM Assurances a WHERE a.deleted = false AND a.id !=1 AND a.id !=12")
     List<Assurances> findAssurerAutre();
 
 }

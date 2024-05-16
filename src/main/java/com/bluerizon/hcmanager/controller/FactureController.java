@@ -674,7 +674,8 @@ public class FactureController
                     traitement.setBaseRembours(item.getBaseRembour());
                     traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
                 }
-            } else if (traitementInit.getTypePatient().getId() == 2) {
+            }
+            else if (traitementInit.getTypePatient().getId() == 2) {
                 if (item.isUnite() == false){
                     Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
                     traitement.setNetPayAssu(netAss);
@@ -688,10 +689,23 @@ public class FactureController
 //                    traitement.setBaseRembours(item.getBaseRembour());
 //                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getBaseRembour());
                 }
-            }else if (traitementInit.getTypePatient().getId() == 3) {
+            }
+            else if (traitementInit.getTypePatient().getId() == 3) {
                 traitement.setNetPayAssu(0.0);
                 traitement.setBaseRembours(0.0);
                 traitement.setNetPayBeneficiaire(traitementInit.getPrice());
+            }
+            else if (traitementInit.getTypePatient().getId() == 4){
+                if (item.isUnite() == false){
+                    Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
+                    traitement.setNetPayAssu(netAss);
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
+                } else {
+                    traitement.setNetPayAssu(item.getNetAssurance());
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
+                }
             }
 
             total += traitement.getNetPayBeneficiaire();
@@ -722,6 +736,8 @@ public class FactureController
             bis = GenarateFacture.autrePdf(factureSave, traitementSave);
         } else if (factureSave.getFiche().getPatient().getTypePatient().getId() == 3) {
             bis = GenarateFacture.nonPdf(factureSave, traitementSave);
+        }if (factureSave.getFiche().getPatient().getTypePatient().getId() == 4){
+            bis = GenarateFacture.inamPdf(factureSave, traitementSave);
         }
 
         final Resource resource = this.fileStorageService.loadAsResource(bis.getName());
@@ -811,6 +827,17 @@ public class FactureController
                 traitement.setNetPayAssu(0.0);
                 traitement.setBaseRembours(item.getBaseRembour());
                 traitement.setNetPayBeneficiaire(traitementInit.getPrice());
+            }else if (traitementInit.getTypePatient().getId() == 4){
+                if (item.isUnite() == false){
+                    Double netAss = (traitementInit.getPrice() * item.getBaseRembour())/100;
+                    traitement.setNetPayAssu(netAss);
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - netAss);
+                } else {
+                    traitement.setNetPayAssu(item.getNetAssurance());
+                    traitement.setBaseRembours(item.getBaseRembour());
+                    traitement.setNetPayBeneficiaire(traitementInit.getPrice() - item.getNetAssurance());
+                }
             }
             total += traitement.getNetPayBeneficiaire();
             ficheTraitements.add(traitement);
